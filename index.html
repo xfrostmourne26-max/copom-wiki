@@ -1,1352 +1,630 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wiki PMPR - Naturezas de Ocorrências</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Quill.js v2 -->
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="favicon.png">
-    <style>
-        :root { --canvas:#f4f6f9; --panel:#edf1f7; --paper:#fff; --ink:#243247; --muted:#617087; --line:#d9e0eb; --accent:#315fa2; --soft:#e9f0fa; --reading-size:18px; color-scheme:light; }
-        body[data-theme="dark"] { --canvas:#171e29; --panel:#202a39; --paper:#1c2533; --ink:#e0e7f1; --muted:#a7b5ca; --line:#354359; --accent:#9bbff5; --soft:#293d59; color-scheme:dark; }
-        * { box-sizing:border-box; }
-        body { background:var(--canvas)!important; color:var(--ink)!important; font-family:'Trebuchet MS',sans-serif; }
-        body > header { background:var(--paper)!important; border-color:var(--line)!important; box-shadow:none!important; padding:20px 32px!important; }
-        header h1 { font-size:20px!important; letter-spacing:.04em!important; }
-        header h1 + p { color:var(--muted)!important; margin-top:3px; }
-        header > div > div:first-child { background:var(--soft)!important; color:var(--accent)!important; }
-        #status-conexao { background:var(--soft)!important; color:var(--accent)!important; border-color:var(--line)!important; }
-        .auth-chip { display:inline-flex; align-items:center; gap:6px; padding:6px 11px; border-radius:999px; font-size:12px; border:1px solid var(--line); background:var(--soft); color:var(--accent); }
-        .copomplus-link { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; border:1px solid var(--line); background:var(--panel); color:var(--accent); text-decoration:none; }
-        .copomplus-link:hover { background:var(--soft); }
-        .workspace { display:grid; grid-template-columns:220px minmax(0,1fr) 190px; gap:32px; max-width:1600px; padding:32px; align-items:start; }
-        .workspace > * { min-width:0; }
-        .library,.reading-rail { position:sticky; top:24px; max-height:calc(100dvh - 48px); overflow:auto; scrollbar-width:thin; }
-        .library { background:transparent!important; border:0!important; border-radius:0!important; padding:0!important; height:auto!important; }
-        .library h2,.rail-title { font-size:11px!important; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)!important; margin-bottom:16px; }
-        .home-link { display:block; color:var(--accent); font-size:13px; margin-bottom:28px; padding-bottom:18px; border-bottom:1px solid var(--line); }
-        #contador-naturezas { display:block; color:var(--muted); font-size:11px; margin-bottom:14px; }
-        #lista-naturezas { display:grid; gap:4px; }
-        .natureza-item { display:flex; align-items:baseline; gap:10px; width:100%; padding:11px 9px; text-align:left; border-radius:4px; color:var(--accent); font-size:13px; line-height:1.5; }
-        .natureza-item:hover,.natureza-item[aria-current="page"] { background:var(--soft); }
-        .natureza-code { color:var(--muted); font:11px monospace; min-width:30px; }
-        .reading-paper { background:var(--paper)!important; border:1px solid var(--line)!important; border-radius:6px!important; padding:clamp(24px,3vw,48px)!important; min-height:calc(100dvh - 155px); height:auto!important; overflow:visible!important; }
-        .search-zone { position:relative; margin-bottom:32px; }
-        .home-heading { display:none; }
-        body:has(#container-conteudo.hidden) .reading-paper { display:flex; justify-content:center; }
-        body:has(#container-conteudo.hidden) .home-heading { display:block; }
-        body:has(#container-conteudo.hidden) .search-zone { margin:60px 0 120px; }
-        .eyebrow { font-size:11px; color:var(--accent); text-transform:uppercase; letter-spacing:.13em; margin-bottom:14px; }
-        .home-heading h2 { font-size:clamp(28px,3vw,42px); line-height:1.2; letter-spacing:-.035em; margin-bottom:14px; font-weight:600; }
-        .home-heading p:last-child { color:var(--muted); font-size:14px; line-height:1.7; margin-bottom:28px; }
-        .search-form { display:flex; border:1px solid var(--line); border-radius:5px; background:var(--paper); overflow:hidden; }
-        .search-form:focus-within { outline:2px solid var(--accent); outline-offset:2px; }
-        input[type="text"],input[type="search"],input[type="email"],input[type="password"] { background:var(--paper)!important; color:var(--ink)!important; border-color:var(--line)!important; }
-        input::placeholder { color:var(--muted)!important; }
-        #busca-input { width:100%; min-width:0; padding:14px; border:0; outline:none; font-size:14px; }
-        .search-submit { padding:0 18px; background:var(--accent); color:var(--paper); font-size:13px; font-weight:600; }
-        #resultados-busca { position:absolute; top:100%; margin-top:8px; width:100%; background:var(--paper); border:1px solid var(--line); border-radius:5px; box-shadow:0 12px 28px #14243b18; max-height:340px; overflow:auto; z-index:10; padding:8px; }
-        .empty-message { color:var(--muted); font-size:13px; padding:14px 8px; line-height:1.6; }
-        #container-conteudo { overflow:visible!important; }
-        #container-conteudo > div:first-child { border-color:var(--line)!important; padding-bottom:24px; }
-        #titulo-natureza { color:var(--ink)!important; font-size:clamp(25px,2.5vw,36px)!important; line-height:1.25; font-weight:600!important; margin-top:16px; letter-spacing:-.025em; }
-        #tag-id-natureza,#tag-vinculos-count,#lista-vinculos-tags > * { background:var(--soft)!important; color:var(--accent)!important; border-color:var(--line)!important; }
-        #modo-leitura { overflow:visible!important; padding-top:28px; }
-        .conteudo-renderizado { color:var(--ink); font-size:var(--reading-size); line-height:1.8; overflow-wrap:anywhere; box-shadow:none!important; }
-        .conteudo-renderizado p { margin-bottom:1em; }
-        .conteudo-renderizado h1 { font-size:1.7em; margin:1em 0 .5em; font-weight:600; }
-        .conteudo-renderizado h2 { font-size:1.4em; margin:1.3em 0 .5em; border-bottom:1px solid var(--line); padding-bottom:8px; }
-        .conteudo-renderizado h3 { font-size:1.15em; font-weight:600; margin:1em 0 .5em; }
-        .conteudo-renderizado ul { list-style:disc; padding-left:1.5em; margin-bottom:1em; }
-        .conteudo-renderizado ol { list-style:decimal; padding-left:1.5em; margin-bottom:1em; }
-        .conteudo-renderizado a { color:var(--accent); text-decoration:underline; text-underline-offset:3px; }
-        .conteudo-renderizado blockquote { border-left:3px solid var(--accent); padding-left:1em; margin:1em 0; }
-        .conteudo-renderizado pre { white-space:pre-wrap; background:var(--soft); padding:16px; }
-        .ql-editor img,.conteudo-renderizado img { max-width:100%; height:auto; margin:20px 0; border-radius:4px; }
-        .ql-editor iframe,.conteudo-renderizado iframe { width:100%; aspect-ratio:16/9; margin:20px 0; }
-        .rail-section { border-bottom:1px solid var(--line); padding-bottom:24px; margin-bottom:24px; }
-        .theme-options { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-        .theme-option { border:1px solid var(--line); border-radius:4px; padding:10px; font-size:11px; }
-        .theme-option[aria-pressed="true"] { outline:2px solid var(--accent); outline-offset:2px; }
-        .theme-option span { display:block; font-size:21px; margin-bottom:4px; }
-        button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
-        .size-control { display:flex; align-items:center; justify-content:space-between; border:1px solid var(--line); border-radius:4px; margin-top:20px; }
-        .size-control button { padding:8px 12px; }
-        .size-control output { font-size:11px; color:var(--muted); }
-        #botoes-acao,#botoes-edicao { flex-direction:column; gap:8px; margin:0; }
-        #botoes-acao button,#botoes-edicao button { width:100%; margin:0; box-shadow:none; background:var(--soft); border:1px solid var(--line); color:var(--accent); padding:10px; font-size:12px; }
-        body:has(#container-conteudo.hidden) .article-actions { display:none; }
-        button:disabled { opacity:.4; cursor:not-allowed; }
-
-        .ql-container.ql-snow { background:var(--paper); color:var(--ink); border:1px solid var(--line)!important; border-radius:6px; font-size:var(--reading-size); }
-        #modo-edicao,#editor-container { overflow:visible!important; }
-        .ql-editor { min-height:65vh; padding:20px 16px; line-height:1.8; }
-        .ql-snow .ql-tooltip { z-index:30; background:var(--paper); color:var(--ink); border-color:var(--line); box-shadow:0 4px 16px #14243b18; }
-        [data-theme="dark"] .ql-snow .ql-stroke { stroke:var(--ink); }
-        [data-theme="dark"] .ql-snow .ql-fill { fill:var(--ink); }
-        [data-theme="dark"] .ql-snow .ql-picker { color:var(--ink); }
-        .ql-snow .ql-tooltip::before { content:'Referência:'; }
-        .ql-snow .ql-tooltip[data-mode="link"]::before { content:'Endereço do link:'; }
-        .ql-snow .ql-tooltip a.ql-action::after { content:'Editar'; }
-        .ql-snow .ql-tooltip.ql-editing a.ql-action::after { content:'Salvar'; }
-        .ql-snow .ql-tooltip a.ql-remove::before { content:'Remover'; }
-        .ql-snow .ql-picker-options { background:var(--paper); z-index:60; }
-
-        #modal-vinculos > div, #modal-acesso > div { background:var(--paper)!important; color:var(--ink); border-color:var(--line); }
-        #modal-vinculos h3, #modal-acesso h3, #lista-modal-naturezas .text-slate-200 { color:var(--ink)!important; }
-        #lista-modal-naturezas { background:var(--canvas)!important; border-color:var(--line)!important; }
-        #lista-modal-naturezas label { background:transparent; }
-        #lista-modal-naturezas label:has(:checked) { background:var(--soft); border-color:var(--line); }
-
-        .floating-editor-toast {
-            position:fixed;
-            z-index:45;
-            width:min(460px, calc(100vw - 24px));
-            background:var(--panel);
-            color:var(--ink);
-            border:1px solid var(--line);
-            border-radius:6px;
-            box-shadow:0 14px 34px rgba(15, 23, 42, 0.24);
-            overflow:visible;
-            right:20px;
-            bottom:20px;
-            font-family:'Trebuchet MS',sans-serif;
-        }
-        .floating-toast-header {
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            gap:8px;
-            padding:8px 10px;
-            background:var(--panel);
-            border-bottom:1px solid var(--line);
-            border-radius:6px 6px 0 0;
-            cursor:grab;
-            user-select:none;
-        }
-        .floating-editor-toast.collapsed .floating-toast-header { border-bottom:0; border-radius:6px; }
-        .floating-toast-header:active { cursor:grabbing; }
-        .floating-toast-title {
-            display:flex;
-            align-items:center;
-            gap:7px;
-            font-size:11px;
-            font-weight:700;
-            letter-spacing:.05em;
-            text-transform:uppercase;
-            color:var(--muted);
-        }
-        .floating-toast-controls { display:flex; align-items:center; gap:2px; }
-        .toast-icon-btn {
-            padding:4px 6px;
-            border-radius:4px;
-            font-size:11px;
-            color:var(--muted);
-            background:transparent;
-            border:1px solid transparent;
-        }
-        .toast-icon-btn:hover { background:var(--soft); color:var(--accent); }
-        .floating-toast-body { padding:8px 10px 10px; display:grid; gap:8px; max-height:74dvh; overflow-y:auto; }
-        .floating-editor-toast.collapsed .floating-toast-body { display:none; }
-
-        #toast-quill-toolbar-host .ql-toolbar.ql-snow {
-            margin-top:0;
-            padding:0 0 8px 0;
-            background:transparent;
-            border:0;
-            border-bottom:1px solid var(--line);
-            border-radius:0;
-            display:flex;
-            flex-wrap:wrap;
-            align-items:center;
-            gap:4px;
-            overflow:visible;
-        }
-        #toast-quill-toolbar-host .ql-toolbar.ql-snow .ql-formats { margin-right:6px; margin-bottom:2px; }
-
-        .quill-addon-strip { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
-        .quill-addon-item {
-            display:inline-flex;
-            align-items:center;
-            gap:5px;
-            height:26px;
-            padding:0 7px;
-            background:var(--paper);
-            border:1px solid var(--line);
-            border-radius:4px;
-            font-size:11px;
-            color:var(--ink);
-        }
-        .quill-addon-item label { font-size:10px; color:var(--muted); user-select:none; cursor:pointer; white-space:nowrap; }
-        .quill-addon-select {
-            height:22px;
-            padding:0 4px;
-            font-size:11px;
-            border:0;
-            border-radius:3px;
-            background:transparent!important;
-            color:var(--ink)!important;
-            cursor:pointer;
-        }
-        .quill-addon-select option { background:var(--paper); color:var(--ink); }
-        .quick-color-input { width:18px; height:18px; padding:0; border:1px solid var(--line); border-radius:3px; background:transparent; cursor:pointer; }
-        .quill-addon-btn {
-            height:26px;
-            padding:0 8px;
-            font-size:11px;
-            border:1px solid var(--line);
-            border-radius:4px;
-            background:var(--paper);
-            color:var(--muted);
-            white-space:nowrap;
-        }
-        .quill-addon-btn:hover { background:var(--soft); color:var(--accent); }
-        #status-upload { color:var(--muted); font-size:11px; line-height:1.45; min-height:14px; }
-
-        [data-fxcolor="vermelho"] { --fx-color:#ef4444; }
-        [data-fxcolor="laranja"] { --fx-color:#f97316; }
-        [data-fxcolor="amarelo"] { --fx-color:#eab308; }
-        [data-fxcolor="verde"] { --fx-color:#22c55e; }
-        [data-fxcolor="ciano"] { --fx-color:#06b6d4; }
-        [data-fxcolor="azul"] { --fx-color:#3b82f6; }
-        [data-fxcolor="roxo"] { --fx-color:#a855f7; }
-        [data-fxcolor="rosa"] { --fx-color:#ec4899; }
-        [data-fxcolor="branco"] { --fx-color:#ffffff; }
-
-        .fx-estilo-arcoiris {
-            background:linear-gradient(90deg, #ef4444, #f59e0b, #10b981, #3b82f6, #8b5cf6, #ec4899);
-            -webkit-background-clip:text;
-            background-clip:text;
-            color:transparent!important;
-            font-weight:700;
-        }
-        .fx-estilo-brilho {
-            color:var(--fx-color, #ffffff)!important;
-            text-shadow:0 0 8px color-mix(in srgb, var(--fx-color, #60a5fa) 85%, transparent), 0 0 18px color-mix(in srgb, var(--fx-color, #3b82f6) 70%, transparent);
-        }
-        .fx-estilo-neon {
-            color:var(--fx-color, #38bdf8)!important;
-            text-shadow:0 0 6px var(--fx-color, #0284c7), 0 0 14px var(--fx-color, #38bdf8), 0 0 24px color-mix(in srgb, var(--fx-color, #818cf8) 75%, transparent);
-        }
-        .fx-estilo-fogo {
-            background:linear-gradient(180deg, #fde047 0%, var(--fx-color, #f97316) 55%, #dc2626 100%);
-            -webkit-background-clip:text;
-            background-clip:text;
-            color:transparent!important;
-            text-shadow:0 2px 10px color-mix(in srgb, var(--fx-color, #f97316) 45%, transparent);
-            font-weight:700;
-        }
-        .fx-estilo-ouro {
-            background:linear-gradient(135deg, #fef08a 0%, var(--fx-color, #eab308) 50%, #a16207 100%);
-            -webkit-background-clip:text;
-            background-clip:text;
-            color:transparent!important;
-            font-weight:700;
-        }
-        .fx-estilo-sombra { color:var(--fx-color, inherit); text-shadow:2px 3px 6px color-mix(in srgb, var(--fx-color, #0f172a) 55%, transparent); }
-        .fx-estilo-contorno { color:transparent!important; -webkit-text-stroke:1px var(--fx-color, var(--accent)); font-weight:700; }
-
-        @keyframes fxPulsar { 0%, 100% { transform:scale(1); } 50% { transform:scale(1.06); } }
-        @keyframes fxTremer { 0%, 100% { transform:translateX(0); } 25% { transform:translateX(-2px) rotate(-0.6deg); } 75% { transform:translateX(2px) rotate(0.6deg); } }
-        @keyframes fxQuicar { 0%, 100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
-        @keyframes fxFlutuar { 0%, 100% { transform:translateY(0px); } 50% { transform:translateY(-3px); } }
-        @keyframes fxPiscar { 0%, 49%, 100% { opacity:1; } 50%, 99% { opacity:0.35; } }
-        @keyframes fxBalancar { 0%, 100% { transform:rotate(0deg); } 25% { transform:rotate(-2.5deg); } 75% { transform:rotate(2.5deg); } }
-        @keyframes fxOnda { 0%, 100% { letter-spacing:normal; } 50% { letter-spacing:0.06em; } }
-
-        .fx-anim-pulsar { display:inline-block; color:var(--fx-color, inherit); animation:fxPulsar 1.8s ease-in-out infinite; }
-        .fx-anim-tremer { display:inline-block; color:var(--fx-color, inherit); animation:fxTremer 0.35s linear infinite; }
-        .fx-anim-quicar { display:inline-block; color:var(--fx-color, inherit); animation:fxQuicar 1s ease-in-out infinite; }
-        .fx-anim-flutuar { display:inline-block; color:var(--fx-color, inherit); animation:fxFlutuar 2.4s ease-in-out infinite; }
-        .fx-anim-piscar { display:inline-block; color:var(--fx-color, inherit); animation:fxPiscar 1.2s step-end infinite; }
-        .fx-anim-balancar { display:inline-block; color:var(--fx-color, inherit); transform-origin:center; animation:fxBalancar 1.6s ease-in-out infinite; }
-        .fx-anim-onda { display:inline-block; color:var(--fx-color, inherit); animation:fxOnda 2s ease-in-out infinite; }
-
-        @media(prefers-reduced-motion:reduce) { [class*="fx-anim-"] { animation:none!important; } }
-        @media(max-width:1100px) { .workspace { grid-template-columns:180px minmax(0,1fr) 160px; gap:20px; padding:24px; } }
-        @media(max-width:900px) { .workspace { grid-template-columns:180px minmax(0,1fr); } .reading-rail { grid-column:2; position:static; max-height:none; display:flex; flex-wrap:wrap; gap:24px; } .reading-rail .rail-section { flex:1; min-width:160px; } }
-        @media(max-width:600px) { body > header { padding:16px!important; gap:12px; flex-wrap:wrap; } header h1 + p { font-size:10px!important; } .workspace { display:flex; flex-direction:column; padding:16px; gap:24px; } .reading-paper { order:0; width:100%; min-height:50vh; padding:24px!important; } .library { order:1; width:100%; position:static; max-height:320px; } .reading-rail { order:2; width:100%; } .home-link { margin-bottom:16px; } body:has(#container-conteudo.hidden) .search-zone { margin:40px 0; } .search-submit { padding:0 12px; } }
-        @media(prefers-reduced-motion:no-preference) { button { transition:background-color .15s ease; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copom-Wiki</title>
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+:root{--bg:#f6f6f6;--paper:#fff;--ink:#202122;--muted:#54595d;--line:#c8ccd1;--soft:#eaf3ff;--link:#0645ad;--accent:#1e3a5f;--box:#f8f9fa;--read:17px;color-scheme:light}
+:root[data-theme=dark]{--bg:#101418;--paper:#171c22;--ink:#e3e8ee;--muted:#9aa7b8;--line:#2f3945;--soft:#1f2b3a;--link:#7fb0f0;--accent:#7aa2d6;--box:#1b2129;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh}
+button{font:inherit;cursor:pointer;color:inherit}
+button:disabled{opacity:.4;cursor:not-allowed}
+.hidden{display:none!important}
+a{color:var(--link)}
+/* header */
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 22px;background:var(--paper);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50}
+.brand{display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:0;padding:0;text-align:left}
+.brand i{background:var(--accent);color:#fff;padding:9px;border-radius:6px}
+.brand b{display:block;font:700 18px Georgia,serif;letter-spacing:.03em}
+.brand small{color:var(--muted);font-size:11px}
+.search{flex:1;min-width:240px;max-width:640px;margin:0 auto;position:relative}
+.search form{display:flex;border:1px solid var(--line);border-radius:4px;background:var(--box);overflow:hidden}
+.search form:focus-within{outline:2px solid var(--accent)}
+.search input{flex:1;border:0;background:transparent;color:var(--ink);padding:9px 12px;font-size:14px;outline:0;min-width:0}
+.search button{border:0;background:var(--accent);color:#fff;padding:0 16px;font-weight:600}
+#res{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--paper);border:1px solid var(--line);border-radius:4px;box-shadow:0 10px 26px rgba(0,0,0,.2);max-height:340px;overflow:auto;padding:4px;z-index:60}
+.tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.grp{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--box)}
+.grp button,.grp span{background:none;border:0;border-right:1px solid var(--line);padding:5px 9px;font-size:12px;color:var(--muted)}
+.grp button:last-child{border-right:0}
+.grp button:hover:not(:disabled){background:var(--soft);color:var(--accent)}
+.chip{border:1px solid var(--line);background:var(--box);border-radius:4px;padding:5px 9px}
+.btn{border:1px solid var(--line);background:var(--box);border-radius:4px;padding:6px 11px;font-size:12px}
+.btn:hover:not(:disabled){background:var(--soft);color:var(--accent)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri:hover:not(:disabled){background:var(--accent);color:#fff;filter:brightness(1.15)}
+.btn.danger{color:#b32424;border-color:#d9a3a3}
+/* layout */
+.wrap{display:grid;grid-template-columns:220px minmax(0,1fr) 290px;gap:0;max-width:1680px;margin:0 auto;padding:0 0 40px}
+.side{padding:18px 16px;font-size:13px;position:sticky;top:62px;align-self:start;max-height:calc(100vh - 62px);overflow:auto}
+.side h3{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.side h3:first-child{margin-top:0}
+.nav{display:flex;gap:8px;width:100%;text-align:left;background:none;border:0;padding:5px 6px;border-radius:3px;color:var(--link);font-size:13px;line-height:1.35}
+.nav:hover,.nav[aria-current]{background:var(--soft);text-decoration:underline}
+.nav .c{font:11px monospace;color:var(--muted);min-width:30px;padding-top:1px}
+.muted{color:var(--muted);font-size:12px;padding:6px}
+main{background:var(--paper);border:1px solid var(--line);border-width:0 1px;min-height:calc(100vh - 62px);padding:22px 44px 50px;min-width:0}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:-4px 0 14px;font-size:13px;flex-wrap:wrap}
+.tabs span{padding:6px 14px;border:1px solid var(--line);border-bottom:0;background:var(--paper);margin-bottom:-1px;border-radius:3px 3px 0 0;color:var(--ink);font-weight:600}
+h1.title{font:400 clamp(26px,3vw,36px)/1.2 Georgia,"Linux Libertine",serif;margin:0 0 4px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.sub{color:var(--muted);font-size:12.5px;margin:6px 0 16px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.tags button{border:1px solid var(--line);background:var(--box);color:var(--link);border-radius:3px;padding:2px 8px;font-size:12px}
+.hero h1{font:400 clamp(26px,3vw,36px) Georgia,serif;margin:0 0 6px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.hero p{color:var(--muted);line-height:1.6;max-width:760px}
+.recent{list-style:none;padding:0;margin:14px 0 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.recent button{width:100%;text-align:left;border:1px solid var(--line);background:var(--box);border-radius:4px;padding:11px 13px;display:flex;flex-direction:column;gap:4px}
+.recent button:hover{border-color:var(--accent);background:var(--soft)}
+.recent b{color:var(--link);font-size:13.5px}
+.recent span{color:var(--muted);font-size:12px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.recent small{color:var(--muted);font-size:11px}
+h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-bottom:4px;margin:26px 0 4px}
+/* article */
+.art.ql-editor{padding:0;height:auto;min-height:0;overflow:visible;font-size:var(--read);line-height:1.75;color:var(--ink);max-width:92ch}
+.art.ql-editor h1,.art.ql-editor h2{font:400 1.5em/1.3 Georgia,serif;border-bottom:1px solid var(--line);padding-bottom:3px;margin:1.3em 0 .5em}
+.art.ql-editor h3{font-weight:700;font-size:1.15em;margin:1.1em 0 .4em}
+.art.ql-editor p,.art.ql-editor ol,.art.ql-editor ul{margin-bottom:.8em}
+.art.ql-editor img{max-width:100%;height:auto;border:1px solid var(--line);padding:3px;background:var(--box);margin:10px 0}
+.art.ql-editor iframe{width:100%;aspect-ratio:16/9;border:0}
+.art.ql-editor a{color:var(--link)}
+.art.ql-editor blockquote{border-left:4px solid var(--line);color:var(--muted)}
+.empty{color:var(--muted);font-style:italic}
+#editor .ql-editor{min-height:60vh;font-size:var(--read);line-height:1.7}
+.ql-toolbar.ql-snow,.ql-container.ql-snow{border-color:var(--line)!important;background:var(--paper);color:var(--ink)}
+.ql-toolbar.ql-snow{position:sticky;top:62px;z-index:20;background:var(--box)}
+:root[data-theme=dark] .ql-snow .ql-stroke{stroke:var(--ink)}
+:root[data-theme=dark] .ql-snow .ql-fill{fill:var(--ink)}
+:root[data-theme=dark] .ql-snow .ql-picker{color:var(--ink)}
+.ql-snow .ql-picker-options{background:var(--paper)}
+#upst{font-size:12px;color:var(--muted);margin:6px 0}
+/* right rail */
+.box{border:1px solid var(--line);background:var(--box);font-size:13px;margin-bottom:16px}
+.box h3{margin:0;padding:7px 12px;background:var(--soft);border-bottom:1px solid var(--line);font-size:13px;text-align:center}
+.box .in{padding:10px 12px}
+.row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dotted var(--line)}
+.row:last-child{border:0}.row span:first-child{color:var(--muted)}
+.toc{display:grid;gap:4px}
+.toc a{text-decoration:none;line-height:1.35}.toc a:hover{text-decoration:underline}
+.toc .h3{padding-left:14px;font-size:12.5px}
+.acts{display:grid;gap:6px}.acts .btn{text-align:left}
+/* modals */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal>div{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:20px;width:100%;max-width:480px;display:grid;gap:12px}
+.modal h3{margin:0}
+.modal input[type=email],.modal input[type=password],.modal input[type=search]{width:100%;padding:9px;border:1px solid var(--line);border-radius:4px;background:var(--box);color:var(--ink)}
+.lst{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:4px;padding:6px}
+.lst label{display:flex;gap:8px;padding:5px;font-size:13px;cursor:pointer;border-radius:3px}.lst label:hover{background:var(--soft)}
+.end{display:flex;justify-content:flex-end;gap:8px}
+#msg{font-size:12px;color:#b45309;min-height:16px}
+/* efeitos de texto */
+[data-fxcolor=vermelho]{--fx:#ef4444}[data-fxcolor=laranja]{--fx:#f97316}[data-fxcolor=amarelo]{--fx:#eab308}[data-fxcolor=verde]{--fx:#22c55e}[data-fxcolor=ciano]{--fx:#06b6d4}[data-fxcolor=azul]{--fx:#3b82f6}[data-fxcolor=roxo]{--fx:#a855f7}[data-fxcolor=rosa]{--fx:#ec4899}[data-fxcolor=branco]{--fx:#fff}
+.fx-estilo-arcoiris{background:linear-gradient(90deg,#ef4444,#f59e0b,#10b981,#3b82f6,#8b5cf6,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent!important;font-weight:700}
+.fx-estilo-brilho{color:var(--fx,#fff)!important;text-shadow:0 0 8px var(--fx,#60a5fa),0 0 18px var(--fx,#3b82f6)}
+.fx-estilo-neon{color:var(--fx,#38bdf8)!important;text-shadow:0 0 6px var(--fx,#0284c7),0 0 14px var(--fx,#38bdf8),0 0 24px var(--fx,#818cf8)}
+.fx-estilo-fogo{background:linear-gradient(180deg,#fde047,var(--fx,#f97316) 55%,#dc2626);-webkit-background-clip:text;background-clip:text;color:transparent!important;font-weight:700}
+.fx-estilo-ouro{background:linear-gradient(135deg,#fef08a,var(--fx,#eab308) 50%,#a16207);-webkit-background-clip:text;background-clip:text;color:transparent!important;font-weight:700}
+.fx-estilo-sombra{color:var(--fx,inherit);text-shadow:2px 3px 6px rgba(0,0,0,.45)}
+.fx-estilo-contorno{color:transparent!important;-webkit-text-stroke:1px var(--fx,var(--accent));font-weight:700}
+@keyframes fxP{50%{transform:scale(1.06)}}@keyframes fxT{25%{transform:translateX(-2px) rotate(-.6deg)}75%{transform:translateX(2px) rotate(.6deg)}}
+@keyframes fxQ{50%{transform:translateY(-5px)}}@keyframes fxF{50%{transform:translateY(-3px)}}@keyframes fxPi{50%{opacity:.35}}
+@keyframes fxB{25%{transform:rotate(-2.5deg)}75%{transform:rotate(2.5deg)}}@keyframes fxO{50%{letter-spacing:.06em}}
+[class*=fx-anim-]{display:inline-block;color:var(--fx,inherit)}
+.fx-anim-pulsar{animation:fxP 1.8s ease-in-out infinite}.fx-anim-tremer{animation:fxT .35s linear infinite}.fx-anim-quicar{animation:fxQ 1s ease-in-out infinite}.fx-anim-flutuar{animation:fxF 2.4s ease-in-out infinite}.fx-anim-piscar{animation:fxPi 1.2s step-end infinite}.fx-anim-balancar{animation:fxB 1.6s ease-in-out infinite}.fx-anim-onda{animation:fxO 2s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){[class*=fx-anim-]{animation:none!important}}
+.fxstrip{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px;border:1px solid var(--line);border-top:0;background:var(--box);font-size:11px}
+.fxstrip .it{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:4px;background:var(--paper);padding:2px 7px;height:28px}
+.fxstrip select{border:0;background:transparent;color:var(--ink);font-size:12px}
+.fxstrip select option{background:var(--paper)}
+.fxstrip input[type=color]{width:20px;height:20px;padding:0;border:1px solid var(--line);background:none;cursor:pointer}
+@media(max-width:1150px){.wrap{grid-template-columns:200px minmax(0,1fr)}.rail{grid-column:1/-1;padding:0 22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}.rail .box{margin:0}main{border-right:0}}
+@media(max-width:760px){.wrap{display:block}.side{position:static;max-height:none}main{padding:18px;border-width:1px 0}.rail{display:block;padding:16px}.rail .box{margin-bottom:12px}header{padding:10px 14px}}
+</style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
-
-    <!-- Header -->
-    <header class="bg-slate-800 border-b border-slate-700 shadow-md py-3 px-6 flex justify-between items-center gap-3 flex-wrap">
-        <div class="flex items-center space-x-3">
-            <div class="bg-blue-600 text-white p-2 rounded-lg font-bold">
-                <i class="fa-solid fa-shield-halved"></i>
-            </div>
-            <div>
-                <h1 class="text-xl font-bold tracking-wide">WIKI PMPR</h1>
-                <p class="text-xs text-slate-400">Base de Dados e Padrões de Naturezas - COPOM</p>
-            </div>
-        </div>
-        <div class="flex items-center gap-2 flex-wrap">
-            <a id="link-copomplus" href="https://copomplus.vercel.app" target="_blank" rel="noopener noreferrer" class="copomplus-link" title="Abrir site COPOMPLUS">
-                <i class="fa-solid fa-up-right-from-square text-[11px]"></i> COPOMPLUS
-            </a>
-            <span id="badge-permissao" class="auth-chip">
-                <i class="fa-solid fa-eye text-[10px]"></i> Leitura (Sem login)
-            </span>
-            <button type="button" id="btn-abrir-acesso" onclick="abrirModalAcesso('login')" class="text-xs px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
-                <i class="fa-solid fa-user-lock mr-1"></i> Entrar / Cadastrar
-            </button>
-            <button type="button" id="btn-sair-acesso" onclick="sairConta()" class="hidden text-xs px-3 py-1.5 rounded-lg border border-slate-600 hover:bg-slate-700 transition">
-                <i class="fa-solid fa-right-from-bracket mr-1"></i> Sair
-            </button>
-            <div id="status-conexao" class="text-xs px-3 py-1 rounded-full bg-emerald-900/50 text-emerald-400 border border-emerald-700">
-                <i class="fa-solid fa-circle text-[8px] mr-1"></i> Conectando...
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Container -->
-    <main class="workspace flex-1 w-full mx-auto">
-
-        <!-- Sidebar: Pesquisa e Lista -->
-        <aside class="library bg-slate-800 border border-slate-700 rounded-xl p-4 flex flex-col h-[84vh]">
-            <button type="button" class="home-link" onclick="voltarInicio()">Página inicial</button>
-            <h2>Sugestões de consulta</h2>
-            <span id="contador-naturezas" aria-live="polite">Carregando sugestões...</span>
-            <div id="lista-naturezas" class="flex-1 overflow-y-auto space-y-1 pr-1"></div>
-        </aside>
-
-        <!-- Content Area -->
-        <section class="reading-paper bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col h-[84vh] overflow-hidden">
-
-            <div class="search-zone">
-                <div class="home-heading">
-                    <p class="eyebrow">Wiki PMPR / COPOM</p>
-                    <h2>Faça sua primeira consulta.</h2>
-                    <p>Encontre orientações e referências por natureza de ocorrência.</p>
-                </div>
-                <form class="search-form" id="form-busca" role="search">
-                    <input type="search" id="busca-input" aria-label="Pesquisar natureza por código ou nome" aria-controls="resultados-busca" aria-expanded="false" placeholder="Código ou nome da natureza" autocomplete="off">
-                    <button type="submit" class="search-submit">Pesquisar</button>
-                </form>
-                <div id="resultados-busca" aria-label="Resultados da pesquisa" class="hidden"></div>
-            </div>
-
-            <!-- Conteúdo da Página -->
-            <div id="container-conteudo" class="flex-1 flex flex-col hidden overflow-hidden">
-                <!-- Cabeçalho -->
-                <div class="flex flex-wrap justify-between items-start pb-4 border-b border-slate-700 gap-3">
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span id="tag-id-natureza" class="bg-blue-900/60 text-blue-300 text-xs font-semibold px-2.5 py-1 rounded border border-blue-700">ID: 0</span>
-                            <span id="tag-vinculos-count" class="hidden bg-purple-900/60 text-purple-300 text-xs font-semibold px-2.5 py-1 rounded border border-purple-700">
-                                <i class="fa-solid fa-link mr-1"></i> <span>0</span> naturezas vinculadas
-                            </span>
-                        </div>
-                        <h2 id="titulo-natureza" class="text-xl md:text-2xl font-bold text-white mt-1.5">Nome da Natureza</h2>
-                        <div id="lista-vinculos-tags" class="flex flex-wrap gap-1.5 mt-2"></div>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2" id="botoes-acao">
-                        <button type="button" id="btn-vincular" onclick="abrirModalVinculos()" class="bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium px-3.5 py-2 rounded-lg transition flex items-center shadow">
-                            <i class="fa-solid fa-link mr-2"></i> Vincular Naturezas
-                        </button>
-                        <button type="button" id="btn-editar" onclick="ativarEdicao()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition flex items-center shadow">
-                            <i class="fa-solid fa-pen-to-square mr-2"></i> Editar Conteúdo
-                        </button>
-                        <button type="button" id="btn-excluir" onclick="deletarConteudo()" title="Apagar conteúdo (requer permissão de Admin)" class="bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white text-sm font-medium px-3 py-2 rounded-lg transition border border-rose-700 flex items-center">
-                            <i class="fa-solid fa-trash mr-2"></i> Excluir conteúdo
-                        </button>
-                    </div>
-
-                    <div class="flex space-x-2 hidden" id="botoes-edicao">
-                        <button type="button" onclick="salvarConteudo()" id="btn-salvar" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition flex items-center shadow">
-                            <i class="fa-solid fa-floppy-disk mr-2"></i> Salvar Alterações
-                        </button>
-                        <button type="button" onclick="cancelarEdicao()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 text-sm font-medium px-4 py-2 rounded-lg transition">
-                            Cancelar
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Corpo (Modo Leitura) -->
-                <div id="modo-leitura" class="flex-1 overflow-y-auto py-4"></div>
-
-                <!-- Corpo (Modo Edição) -->
-                <div id="modo-edicao" class="flex-1 flex flex-col py-3 hidden overflow-hidden">
-                    <div id="editor-container" class="flex-1 overflow-y-auto"></div>
-                </div>
-            </div>
-
-        </section>
-
-        <aside class="reading-rail" aria-label="Preferências de leitura e ferramentas">
-            <div class="rail-section">
-                <h2 class="rail-title">Aparência</h2>
-                <div class="theme-options" role="group" aria-label="Tema da página">
-                    <button type="button" class="theme-option" data-theme-choice="light" style="background:#fff;color:#243247" aria-pressed="true"><span>Aa</span>Claro</button>
-                    <button type="button" class="theme-option" data-theme-choice="dark" style="background:#1c2533;color:#e0e7f1" aria-pressed="false"><span>Aa</span>Escuro</button>
-                </div>
-                <div class="size-control" role="group" aria-label="Tamanho do texto">
-                    <button type="button" id="text-smaller" aria-label="Diminuir texto">A−</button>
-                    <output id="text-size" aria-live="polite">18 px</output>
-                    <button type="button" id="text-larger" aria-label="Aumentar texto">A+</button>
-                </div>
-            </div>
-            <div class="rail-section article-actions"><h2 class="rail-title">Neste artigo</h2><div id="rail-actions"></div></div>
-        </aside>
-    </main>
-
-    <!-- Bloco Flutuante Unificado (Quill + Controles no mesmo layout) -->
-    <div id="painel-flutuante-edicao" class="floating-editor-toast hidden" role="region" aria-label="Barra flutuante do editor Quill">
-        <div id="toast-drag-handle" class="floating-toast-header" title="Arraste para mover a barra do editor">
-            <div class="floating-toast-title">
-                <i class="fa-solid fa-grip-vertical"></i>
-                <span>Quill</span>
-            </div>
-            <div class="floating-toast-controls">
-                <button type="button" id="btn-toggle-toast" class="toast-icon-btn" title="Recolher/Expandir barra" aria-expanded="true">
-                    <i class="fa-solid fa-chevron-down"></i>
-                </button>
-            </div>
-        </div>
-        <div class="floating-toast-body">
-            <div id="toast-quill-toolbar-host" aria-label="Ferramentas de formatação do Quill"></div>
-
-            <div class="quill-addon-strip" role="group" aria-label="Cor ao digitar e efeitos de texto">
-                <div class="quill-addon-item">
-                    <label for="cor-texto-digitando">Cor ao digitar</label>
-                    <input type="color" id="cor-texto-digitando" value="#38bdf8" class="quick-color-input" title="Cor do texto ao digitar" onchange="aplicarCorAoDigitar(this.value)">
-                    <button type="button" onclick="resetarCorAoDigitar()" class="text-[10px] underline opacity-80 hover:opacity-100" title="Voltar cor ao digitar para padrão">Reset</button>
-                </div>
-
-                <div class="quill-addon-item">
-                    <label for="select-efeito-texto">Efeito</label>
-                    <select id="select-efeito-texto" class="quill-addon-select" onchange="aplicarEfeitoTexto(this.value)">
-                        <option value="">Nenhum</option>
-                        <option value="arcoiris">Rainbow</option>
-                        <option value="brilho">Brilho</option>
-                        <option value="neon">Neon</option>
-                        <option value="fogo">Fogo</option>
-                        <option value="ouro">Ouro</option>
-                        <option value="sombra">Sombra</option>
-                        <option value="contorno">Contorno</option>
-                    </select>
-                </div>
-
-                <div class="quill-addon-item">
-                    <label for="select-animacao-texto">Animação</label>
-                    <select id="select-animacao-texto" class="quill-addon-select" onchange="aplicarAnimacaoTexto(this.value)">
-                        <option value="">Nenhuma</option>
-                        <option value="pulsar">Pulsar</option>
-                        <option value="quicar">Quicar</option>
-                        <option value="flutuar">Flutuar</option>
-                        <option value="balancar">Balançar</option>
-                        <option value="tremer">Tremer</option>
-                        <option value="piscar">Piscar</option>
-                        <option value="onda">Onda</option>
-                    </select>
-                </div>
-
-                <div class="quill-addon-item">
-                    <label for="select-cor-efeito">Cor FX</label>
-                    <select id="select-cor-efeito" class="quill-addon-select" onchange="aplicarCorEfeito(this.value)">
-                        <option value="">Padrão</option>
-                        <option value="vermelho">Vermelho</option>
-                        <option value="laranja">Laranja</option>
-                        <option value="amarelo">Amarelo</option>
-                        <option value="verde">Verde</option>
-                        <option value="ciano">Ciano</option>
-                        <option value="azul">Azul</option>
-                        <option value="roxo">Roxo</option>
-                        <option value="rosa">Rosa</option>
-                        <option value="branco">Branco</option>
-                    </select>
-                </div>
-
-                <button type="button" onclick="limparEfeitosEAnimacoes()" class="quill-addon-btn" title="Limpar efeito e animação">Limpar FX</button>
-            </div>
-
-            <input type="file" id="upload-imagem-pc" accept="image/*" class="hidden" onchange="uploadImagemSupabase(event)">
-            <div id="status-upload">Cole prints com Ctrl+V ou use os ícones de imagem/vídeo na barra.</div>
-        </div>
+<body>
+<header>
+  <button class="brand" onclick="voltarInicio()" aria-label="Página inicial">
+    <i class="fa-solid fa-shield-halved"></i>
+    <span><b>Copom-Wiki</b><small>Wikipédia dos Cívis</small></span>
+  </button>
+  <div class="search">
+    <form id="form-busca" role="search">
+      <input id="busca" type="search" placeholder="Buscar por código ou nome da natureza..." autocomplete="off" aria-controls="res">
+      <button type="submit">Buscar</button>
+    </form>
+    <div id="res" class="hidden" role="region" aria-label="Resultados"></div>
+  </div>
+  <div class="tools">
+    <div class="grp" role="group" aria-label="Tamanho do texto e tema">
+      <button type="button" id="menos" title="Diminuir fonte">A−</button>
+      <span id="tam">17 px</span>
+      <button type="button" id="mais" title="Aumentar fonte">A+</button>
+      <button type="button" id="tema" title="Alternar tema claro/escuro" aria-label="Alternar tema"><i class="fa-solid fa-moon"></i></button>
     </div>
+    <a class="btn" id="copomplus" href="https://copomplus.vercel.app/" target="_blank" rel="noopener noreferrer" style="text-decoration:none"><i class="fa-solid fa-up-right-from-square"></i> COPOMPLUS</a>
+    <span id="badge" class="chip"><i class="fa-solid fa-eye"></i> Leitura (sem login)</span>
+    <button class="btn pri" id="btn-entrar" onclick="abrirAcesso('login')"><i class="fa-solid fa-user-lock"></i> Entrar / Cadastrar</button>
+    <button class="btn hidden" id="btn-sair" onclick="sair()"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+    <span id="status" class="chip">Conectando...</span>
+  </div>
+</header>
 
-    <!-- Modal de Acesso (Login / Cadastro) -->
-    <div id="modal-acesso" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
-        <div class="w-full max-w-md rounded-xl border border-slate-700 bg-slate-800 p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center">
-                <h3 id="titulo-modal-acesso" class="text-lg font-bold"><i class="fa-solid fa-right-to-bracket text-blue-400 mr-2"></i>Entrar na Wiki</h3>
-                <button type="button" onclick="fecharModalAcesso()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="flex gap-2">
-                <button type="button" id="tab-login" onclick="alternarAbaAcesso('login')" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-blue-600 text-white">Entrar</button>
-                <button type="button" id="tab-cadastro" onclick="alternarAbaAcesso('cadastro')" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-slate-700 text-slate-300">Cadastrar (USER)</button>
-            </div>
-            <p class="text-xs text-slate-400">Novos cadastros recebem o papel <strong>USER</strong> (somente leitura).</p>
-            <form id="form-acesso" class="space-y-3">
-                <div>
-                    <label for="acesso-email" class="block text-xs mb-1">E-mail</label>
-                    <input type="email" id="acesso-email" required class="w-full px-3 py-2 rounded-lg border text-sm">
-                </div>
-                <div>
-                    <label for="acesso-senha" class="block text-xs mb-1">Senha</label>
-                    <input type="password" id="acesso-senha" required minlength="6" class="w-full px-3 py-2 rounded-lg border text-sm">
-                </div>
-                <p id="mensagem-acesso" class="text-xs text-amber-400 min-h-[16px]"></p>
-                <button type="submit" id="btn-submit-acesso" class="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold">Entrar</button>
-            </form>
+<div class="wrap">
+  <aside class="side" aria-label="Navegação">
+    <button class="nav" onclick="voltarInicio()"><i class="fa-solid fa-house"></i> Página inicial</button>
+    <h3>Ocorrências com conteúdo</h3>
+    <div id="contador" class="muted">Carregando...</div>
+    <div id="lista"></div>
+  </aside>
+
+  <main>
+    <section id="home" class="hero">
+      <p class="muted" style="padding:0;text-transform:uppercase;letter-spacing:.08em;font-weight:700">Copom-Wiki</p>
+      <h1>Base de naturezas de ocorrências</h1>
+      <p>Consulte padrões operacionais, procedimentos e orientações por código ou nome da natureza. Use a busca no topo ou escolha uma das páginas recentes abaixo.</p>
+      <h2 class="sec"><i class="fa-solid fa-clock-rotate-left"></i> Últimos complementos</h2>
+      <ul id="recentes" class="recent"></ul>
+    </section>
+
+    <article id="artigo" class="hidden">
+      <div class="tabs"><span>Artigo</span></div>
+      <h1 class="title" id="titulo"></h1>
+      <div class="sub" id="subtitulo"></div>
+      <div id="vinculos" class="tags"></div>
+      <div id="leitura"><div id="corpo" class="art ql-editor"></div></div>
+      <div id="edicao" class="hidden">
+        <div id="editor"></div>
+        <div id="fxstrip" class="fxstrip" role="group" aria-label="Cor e efeitos de texto">
+  <span class="it"><label for="cor-dig">Cor ao digitar</label><input type="color" id="cor-dig" value="#38bdf8" oninput="corDigitando(this.value)"><button type="button" class="btn" style="padding:0 6px;border:0;background:none;text-decoration:underline" onclick="resetCor()">Reset</button></span>
+  <span class="it"><label for="fx-estilo">Efeito</label><select id="fx-estilo" onchange="fxAplicar('fxestilo',this.value)"><option value="">Nenhum</option><option value="arcoiris">Rainbow</option><option value="brilho">Brilho</option><option value="neon">Neon</option><option value="fogo">Fogo</option><option value="ouro">Ouro</option><option value="sombra">Sombra</option><option value="contorno">Contorno</option></select></span>
+  <span class="it"><label for="fx-anim">Animação</label><select id="fx-anim" onchange="fxAplicar('fxanim',this.value)"><option value="">Nenhuma</option><option value="pulsar">Pulsar</option><option value="quicar">Quicar</option><option value="flutuar">Flutuar</option><option value="balancar">Balançar</option><option value="tremer">Tremer</option><option value="piscar">Piscar</option><option value="onda">Onda</option></select></span>
+  <span class="it"><label for="fx-cor">Cor FX</label><select id="fx-cor" onchange="fxAplicar('fxcolor',this.value)"><option value="">Padrão</option><option value="vermelho">Vermelho</option><option value="laranja">Laranja</option><option value="amarelo">Amarelo</option><option value="verde">Verde</option><option value="ciano">Ciano</option><option value="azul">Azul</option><option value="roxo">Roxo</option><option value="rosa">Rosa</option><option value="branco">Branco</option></select></span>
+  <button type="button" class="btn" onclick="limparFx()">Limpar FX</button>
+</div>
+        <div id="upst">Cole prints com Ctrl+V ou use o ícone de imagem na barra.</div>
+        <input type="file" id="arquivo" accept="image/*" class="hidden">
+      </div>
+    </article>
+  </main>
+
+  <aside class="rail" aria-label="Ficha e ferramentas">
+    <div id="rail-art" class="hidden">
+      <div class="box"><h3>Ficha da natureza</h3><div class="in">
+        <div class="row"><span>Código</span><b id="f-cod"></b></div>
+        <div class="row"><span>Artigo</span><span id="f-art"></span></div>
+        <div class="row"><span>Vinculadas</span><span id="f-vinc"></span></div>
+        <div class="row"><span>Atualizado</span><span id="f-data"></span></div>
+      </div></div>
+      <div class="box" id="box-toc"><h3>Neste artigo</h3><div class="in"><div id="toc" class="toc"></div></div></div>
+      <div class="box"><h3>Ferramentas</h3><div class="in">
+        <div class="acts" id="acts-leitura">
+          <button class="btn" id="btn-editar" onclick="ativarEdicao()"><i class="fa-solid fa-pen-to-square"></i> Editar conteúdo</button>
+          <button class="btn" id="btn-vincular" onclick="abrirVinculos()"><i class="fa-solid fa-link"></i> Vincular naturezas</button>
+          <button class="btn danger" id="btn-excluir" onclick="excluirArtigo()"><i class="fa-solid fa-trash"></i> Excluir conteúdo</button>
         </div>
-    </div>
-
-    <!-- Modal de Vincular Naturezas -->
-    <div id="modal-vinculos" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
-        <div class="w-full max-w-lg rounded-xl border border-slate-700 bg-slate-800 p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center">
-                <h3 class="text-lg font-bold"><i class="fa-solid fa-link text-purple-400 mr-2"></i>Vincular Naturezas</h3>
-                <button type="button" onclick="fecharModalVinculos()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <input type="search" id="busca-modal-vinculo" placeholder="Filtrar por código ou nome..." class="w-full px-3 py-2 rounded-lg border text-sm">
-            <div id="lista-modal-naturezas" class="max-h-64 overflow-y-auto border rounded-lg p-3 space-y-1"></div>
-            <div class="flex justify-end gap-2">
-                <button type="button" onclick="fecharModalVinculos()" class="px-4 py-2 rounded-lg border border-slate-600 text-sm">Cancelar</button>
-                <button type="button" onclick="salvarVinculos()" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold">Salvar Vínculos</button>
-            </div>
+        <div class="acts hidden" id="acts-edicao">
+          <button class="btn pri" id="btn-salvar" onclick="salvarArtigo()"><i class="fa-solid fa-floppy-disk"></i> Salvar alterações</button>
+          <button class="btn" onclick="cancelarEdicao()">Cancelar</button>
         </div>
+      </div></div>
     </div>
-
-    <script>
-        document.getElementById('rail-actions').append(document.getElementById('botoes-acao'), document.getElementById('botoes-edicao'));
-        document.querySelectorAll('[data-theme-choice]').forEach(button => {
-            button.addEventListener('click', () => {
-                document.body.dataset.theme = button.dataset.themeChoice;
-                document.querySelectorAll('[data-theme-choice]').forEach(option => option.setAttribute('aria-pressed', String(option === button)));
-            });
-        });
-        let readingSize = 18;
-        function resizeReading(change) {
-            readingSize = Math.max(15, Math.min(27, readingSize + change));
-            document.documentElement.style.setProperty('--reading-size', readingSize + 'px');
-            document.getElementById('text-size').textContent = readingSize + ' px';
-            document.getElementById('text-smaller').disabled = readingSize === 15;
-            document.getElementById('text-larger').disabled = readingSize === 27;
-        }
-        document.getElementById('text-smaller').addEventListener('click', () => resizeReading(-1));
-        document.getElementById('text-larger').addEventListener('click', () => resizeReading(1));
-
-        (function configurarPainelFlutuante() {
-            const toast = document.getElementById('painel-flutuante-edicao');
-            const handle = document.getElementById('toast-drag-handle');
-            const toggleBtn = document.getElementById('btn-toggle-toast');
-
-            toggleBtn.addEventListener('click', () => {
-                const collapsed = toast.classList.toggle('collapsed');
-                toggleBtn.setAttribute('aria-expanded', String(!collapsed));
-                toggleBtn.innerHTML = collapsed
-                    ? '<i class="fa-solid fa-chevron-up"></i>'
-                    : '<i class="fa-solid fa-chevron-down"></i>';
-            });
-
-            let dragging = false;
-            let offsetX = 0;
-            let offsetY = 0;
-
-            handle.addEventListener('mousedown', (e) => {
-                if (e.target.closest('button')) return;
-                dragging = true;
-                const rect = toast.getBoundingClientRect();
-                toast.style.left = rect.left + 'px';
-                toast.style.top = rect.top + 'px';
-                toast.style.right = 'auto';
-                toast.style.bottom = 'auto';
-                offsetX = e.clientX - rect.left;
-                offsetY = e.clientY - rect.top;
-                e.preventDefault();
-            });
-
-            document.addEventListener('mousemove', (e) => {
-                if (!dragging) return;
-                const maxX = Math.max(8, window.innerWidth - toast.offsetWidth - 8);
-                const maxY = Math.max(8, window.innerHeight - toast.offsetHeight - 8);
-                const nextLeft = Math.min(maxX, Math.max(8, e.clientX - offsetX));
-                const nextTop = Math.min(maxY, Math.max(8, e.clientY - offsetY));
-                toast.style.left = nextLeft + 'px';
-                toast.style.top = nextTop + 'px';
-            });
-
-            document.addEventListener('mouseup', () => {
-                dragging = false;
-            });
-        })();
-    </script>
-
-    <!-- Script de Integração -->
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
-    <script>
-        // ================= CONFIGURAÇÃO DO SUPABASE E LINKS =================
-        const SUPABASE_URL = 'https://duubjdigfuhlmtuhgpfr.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_ma6q8_9h13bFLgusXTeOjw_agSXsYq9';
-        const NOME_BUCKET = 'midias';
-        const COPOMPLUS_URL = 'https://copomplus.vercel.app/';
-
-        document.getElementById('link-copomplus').href = COPOMPLUS_URL;
-
-        const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        let naturezasCache = [];
-        let artigosCache = [];
-        let naturezaAtualId = null;
-        let quillEditor = null;
-        let idsSelecionadosModal = new Set();
-
-        // Controle de sessão e permissão ('user' | 'editor' | 'admin' | null)
-        let usuarioAtual = null;
-        let papelAtual = null;
-        let modoAcessoModal = 'login';
-
-        function podeEditar() {
-            return papelAtual === 'editor' || papelAtual === 'admin';
-        }
-
-        function podeExcluir() {
-            return papelAtual === 'admin';
-        }
-
-        function atualizarInterfacePermissoes() {
-            const badge = document.getElementById('badge-permissao');
-            const btnAbrir = document.getElementById('btn-abrir-acesso');
-            const btnSair = document.getElementById('btn-sair-acesso');
-            const btnVincular = document.getElementById('btn-vincular');
-            const btnEditar = document.getElementById('btn-editar');
-            const btnExcluir = document.getElementById('btn-excluir');
-
-            if (usuarioAtual && papelAtual) {
-                const rotuloPapel = papelAtual === 'admin'
-                    ? 'Admin (Edita e Exclui)'
-                    : papelAtual === 'editor'
-                        ? 'Editor (Apenas Edita)'
-                        : 'User (Somente Leitura)';
-                badge.innerHTML = `<i class="fa-solid fa-user-check text-[10px]"></i> ${usuarioAtual.email} · <strong>${rotuloPapel}</strong>`;
-                btnAbrir.classList.add('hidden');
-                btnSair.classList.remove('hidden');
-            } else {
-                badge.innerHTML = `<i class="fa-solid fa-eye text-[10px]"></i> Leitura (Sem login)`;
-                btnAbrir.classList.remove('hidden');
-                btnSair.classList.add('hidden');
-            }
-
-            if (btnVincular) {
-                btnVincular.disabled = !podeEditar();
-                btnVincular.title = podeEditar() ? 'Vincular naturezas' : 'Permissão Editor ou Admin necessária para vincular';
-            }
-            if (btnEditar) {
-                btnEditar.disabled = !podeEditar();
-                btnEditar.title = podeEditar() ? 'Editar conteúdo' : 'Permissão Editor ou Admin necessária para editar';
-            }
-            if (btnExcluir) {
-                btnExcluir.disabled = !podeExcluir();
-                btnExcluir.title = podeExcluir()
-                    ? 'Apagar conteúdo'
-                    : 'Apenas usuários com permissão de Admin no Supabase podem excluir';
-            }
-
-            if (!podeEditar() && !document.getElementById('modo-edicao').classList.contains('hidden')) {
-                cancelarEdicao();
-            }
-        }
-
-        async function carregarPapelUsuario(user) {
-            usuarioAtual = user || null;
-            papelAtual = null;
-
-            if (!usuarioAtual) {
-                atualizarInterfacePermissoes();
-                return;
-            }
-
-            try {
-                const { data, error } = await supabaseClient
-                    .from('PERFIS_ACESSO')
-                    .select('papel')
-                    .eq('id', usuarioAtual.id)
-                    .maybeSingle();
-
-                if (error) {
-                    console.warn("Aviso ao ler PERFIS_ACESSO:", error.message);
-                }
-                papelAtual = data?.papel || 'user';
-            } catch (err) {
-                console.error("Erro ao consultar permissão:", err);
-                papelAtual = 'user';
-            }
-
-            atualizarInterfacePermissoes();
-        }
-
-        function abrirModalAcesso(aba = 'login') {
-            alternarAbaAcesso(aba);
-            document.getElementById('mensagem-acesso').textContent = '';
-            document.getElementById('modal-acesso').classList.remove('hidden');
-            document.getElementById('modal-acesso').classList.add('flex');
-        }
-
-        function fecharModalAcesso() {
-            document.getElementById('modal-acesso').classList.add('hidden');
-            document.getElementById('modal-acesso').classList.remove('flex');
-        }
-
-        function alternarAbaAcesso(aba) {
-            modoAcessoModal = aba;
-            const tabLogin = document.getElementById('tab-login');
-            const tabCadastro = document.getElementById('tab-cadastro');
-            const titulo = document.getElementById('titulo-modal-acesso');
-            const btnSubmit = document.getElementById('btn-submit-acesso');
-
-            if (aba === 'login') {
-                tabLogin.className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-blue-600 text-white';
-                tabCadastro.className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-slate-700 text-slate-300';
-                titulo.innerHTML = '<i class="fa-solid fa-right-to-bracket text-blue-400 mr-2"></i>Entrar na Wiki';
-                btnSubmit.textContent = 'Entrar';
-            } else {
-                tabCadastro.className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white';
-                tabLogin.className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-slate-700 text-slate-300';
-                titulo.innerHTML = '<i class="fa-solid fa-user-plus text-emerald-400 mr-2"></i>Criar conta (USER)';
-                btnSubmit.textContent = 'Criar conta';
-            }
-        }
-
-        async function sairConta() {
-            await supabaseClient.auth.signOut();
-            await carregarPapelUsuario(null);
-        }
-
-        document.addEventListener("DOMContentLoaded", async () => {
-            const Size = Quill.import('attributors/style/size');
-            Size.whitelist = ['10px', '12px', '14px', '16px', '18px', '20px', '24px', '32px'];
-            Quill.register(Size, true);
-
-            const Parchment = Quill.import('parchment');
-            const Font = Quill.import('attributors/class/font');
-            Font.whitelist = ['serif', 'monospace', 'georgia', 'impact', 'cursiva', 'arredondada'];
-            Quill.register(Font, true);
-            Quill.register(new Parchment.ClassAttributor('fxestilo', 'fx-estilo', {
-                scope: Parchment.Scope.INLINE,
-                whitelist: ['arcoiris', 'brilho', 'neon', 'fogo', 'ouro', 'sombra', 'contorno']
-            }), true);
-            Quill.register(new Parchment.ClassAttributor('fxanim', 'fx-anim', {
-                scope: Parchment.Scope.INLINE,
-                whitelist: ['pulsar', 'tremer', 'quicar', 'flutuar', 'piscar', 'balancar', 'onda']
-            }), true);
-            Quill.register(new Parchment.Attributor('fxcolor', 'data-fxcolor', {
-                scope: Parchment.Scope.INLINE
-            }), true);
-
-            quillEditor = new Quill('#editor-container', {
-                theme: 'snow',
-                modules: {
-                    toolbar: {
-                        container: [
-                            [{ header: [1, 2, 3, false] }],
-                            [{ font: [false, 'serif', 'monospace', 'georgia', 'impact', 'cursiva', 'arredondada'] }],
-                            [{ size: ['12px', '14px', '16px', '18px', '20px', '24px', '32px'] }],
-                            ['bold', 'italic', 'underline', 'strike'],
-                            [{ color: [] }, { background: [] }],
-                            [{ align: [] }],
-                            [{ list: 'ordered' }, { list: 'bullet' }],
-                            ['blockquote', 'link', 'image', 'video'],
-                            ['clean']
-                        ],
-                        handlers: {
-                            image: function() {
-                                document.getElementById('upload-imagem-pc').click();
-                            },
-                            video: function() {
-                                inserirMidiaPorLink();
-                            }
-                        }
-                    }
-                }
-            });
-
-            const quillToolbarEl = quillEditor.getModule('toolbar').container;
-            document.getElementById('toast-quill-toolbar-host').appendChild(quillToolbarEl);
-
-            quillEditor.root.addEventListener('paste', async (e) => {
-                const clipboardItems = e.clipboardData && e.clipboardData.items;
-                if (!clipboardItems) return;
-
-                for (let i = 0; i < clipboardItems.length; i++) {
-                    if (clipboardItems[i].type.indexOf('image') !== -1) {
-                        e.preventDefault();
-                        const file = clipboardItems[i].getAsFile();
-                        if (file) await enviarArquivoParaStorage(file);
-                    }
-                }
-            });
-
-            document.getElementById('form-acesso').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('acesso-email').value.trim();
-                const password = document.getElementById('acesso-senha').value;
-                const msgEl = document.getElementById('mensagem-acesso');
-                const btnSubmit = document.getElementById('btn-submit-acesso');
-
-                btnSubmit.disabled = true;
-                msgEl.textContent = 'Processando...';
-
-                try {
-                    if (modoAcessoModal === 'login') {
-                        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                        if (error) throw error;
-                        await carregarPapelUsuario(data.user);
-                        fecharModalAcesso();
-                    } else {
-                        const { data, error } = await supabaseClient.auth.signUp({ email, password });
-                        if (error) throw error;
-                        if (data.session?.user) {
-                            await carregarPapelUsuario(data.session.user);
-                            fecharModalAcesso();
-                            alert("Conta criada com sucesso, porem só tera acesso a edições depois do Administrador liberar o acesso.");
-                        } else {
-                            msgEl.textContent = 'Cadastro enviado! Se a confirmação de e-mail estiver ativa no banco de dados, confirme seu e-mail antes de entrar.';
-                        }
-                    }
-                } catch (err) {
-                    msgEl.textContent = err.message || 'Falha na autenticação.';
-                } finally {
-                    btnSubmit.disabled = false;
-                }
-            });
-
-            supabaseClient.auth.onAuthStateChange(async (_event, session) => {
-                await carregarPapelUsuario(session?.user || null);
-            });
-
-            const { data: sessaoAtual } = await supabaseClient.auth.getSession();
-            await carregarPapelUsuario(sessaoAtual?.session?.user || null);
-
-            carregarDados();
-
-            document.getElementById('busca-input').addEventListener('input', e => pesquisar(e.target.value));
-            document.getElementById('form-busca').addEventListener('submit', e => {
-                e.preventDefault();
-                pesquisar(document.getElementById('busca-input').value);
-            });
-            document.addEventListener('click', e => {
-                if (!e.target.closest('.search-zone')) fecharPesquisa();
-            });
-            document.getElementById('busca-input').addEventListener('keydown', e => {
-                if (e.key === 'Escape') fecharPesquisa();
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    document.querySelector('#resultados-busca button')?.focus();
-                }
-            });
-            const editorLabels = { color:'Cor do texto', background:'Cor de destaque', link:'Inserir referência (link)', video:'Inserir vídeo ou imagem por link', clean:'Limpar formatação' };
-            Object.entries(editorLabels).forEach(([tool, label]) => {
-                const control = document.querySelector('.ql-toolbar .ql-' + tool);
-                if (!control) return;
-                const target = control.querySelector('.ql-picker-label') || control;
-                target.setAttribute('aria-label', label);
-                target.title = label;
-            });
-            quillEditor.root.setAttribute('aria-label', 'Conteúdo do artigo');
-
-            document.getElementById('busca-modal-vinculo').addEventListener('input', (e) => {
-                renderizarListaModal(e.target.value);
-            });
-        });
-
-        function aplicarCorAoDigitar(corHex) {
-            if (!quillEditor) return;
-            quillEditor.focus();
-            quillEditor.format('color', corHex, 'user');
-        }
-
-        function resetarCorAoDigitar() {
-            if (!quillEditor) return;
-            quillEditor.focus();
-            quillEditor.format('color', false, 'user');
-        }
-
-        function aplicarEfeitoTexto(valor) {
-            if (!quillEditor) return;
-            quillEditor.focus();
-            const range = quillEditor.getSelection(true);
-            if (!range || range.length === 0) {
-                const statusEl = document.getElementById('status-upload');
-                if (statusEl) statusEl.textContent = 'Selecione um trecho de texto para aplicar o efeito.';
-                return;
-            }
-            quillEditor.format('fxestilo', valor ? valor : false, 'user');
-            const corSelecionada = document.getElementById('select-cor-efeito').value;
-            if (valor && corSelecionada) {
-                quillEditor.format('fxcolor', corSelecionada, 'user');
-            }
-        }
-
-        function aplicarAnimacaoTexto(valor) {
-            if (!quillEditor) return;
-            quillEditor.focus();
-            const range = quillEditor.getSelection(true);
-            if (!range || range.length === 0) {
-                const statusEl = document.getElementById('status-upload');
-                if (statusEl) statusEl.textContent = 'Selecione um trecho de texto para aplicar a animação.';
-                return;
-            }
-            quillEditor.format('fxanim', valor ? valor : false, 'user');
-            const corSelecionada = document.getElementById('select-cor-efeito').value;
-            if (valor && corSelecionada) {
-                quillEditor.format('fxcolor', corSelecionada, 'user');
-            }
-        }
-
-        function aplicarCorEfeito(cor) {
-            if (!quillEditor) return;
-            quillEditor.focus();
-            const range = quillEditor.getSelection(true);
-            if (!range || range.length === 0) {
-                const statusEl = document.getElementById('status-upload');
-                if (statusEl) statusEl.textContent = 'Selecione um trecho de texto para aplicar a cor do efeito.';
-                return;
-            }
-            quillEditor.format('fxcolor', cor ? cor : false, 'user');
-        }
-
-        function limparEfeitosEAnimacoes() {
-            if (!quillEditor) return;
-            quillEditor.focus();
-            const range = quillEditor.getSelection(true);
-            if (range && range.length > 0) {
-                quillEditor.format('fxestilo', false, 'user');
-                quillEditor.format('fxanim', false, 'user');
-                quillEditor.format('fxcolor', false, 'user');
-            }
-            document.getElementById('select-efeito-texto').value = '';
-            document.getElementById('select-animacao-texto').value = '';
-            document.getElementById('select-cor-efeito').value = '';
-        }
-
-        async function enviarArquivoParaStorage(file) {
-            if (!podeEditar()) {
-                alert("Permissão Editor ou Admin necessária para enviar mídias.");
-                return;
-            }
-            const statusEl = document.getElementById('status-upload');
-            if (statusEl) statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-amber-400 mr-1"></i> Enviando mídia...`;
-
-            try {
-                const extensao = file.name ? file.name.split('.').pop().toLowerCase() : 'png';
-                const nomeArquivo = `wiki_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${extensao}`;
-
-                const { error: uploadError } = await supabaseClient.storage
-                    .from(NOME_BUCKET)
-                    .upload(nomeArquivo, file, {
-                        contentType: file.type || 'image/png',
-                        cacheControl: '3600',
-                        upsert: false
-                    });
-
-                if (uploadError) throw uploadError;
-
-                const urlFinal = `${SUPABASE_URL}/storage/v1/object/public/${NOME_BUCKET}/${nomeArquivo}`;
-
-                quillEditor.focus();
-                const range = quillEditor.getSelection(true) || { index: quillEditor.getLength() };
-
-                quillEditor.insertEmbed(range.index, 'image', urlFinal, 'user');
-                quillEditor.setSelection(range.index + 1, 0, 'user');
-
-                if (statusEl) {
-                    statusEl.innerHTML = `<i class="fa-solid fa-check text-emerald-400 mr-1"></i> Mídia enviada!`;
-                    setTimeout(() => {
-                        statusEl.textContent = 'Cole prints com Ctrl+V ou use os ícones de imagem/vídeo na barra.';
-                    }, 3000);
-                }
-            } catch (err) {
-                console.error("Erro no upload:", err);
-                if (statusEl) statusEl.textContent = 'Erro ao enviar mídia.';
-                alert("Erro ao enviar: " + err.message);
-            }
-        }
-
-        async function uploadImagemSupabase(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            await enviarArquivoParaStorage(file);
-            event.target.value = '';
-        }
-
-        function inserirMidiaPorLink() {
-            if (!podeEditar()) {
-                alert("Permissão Editor ou Admin necessária para inserir mídias.");
-                return;
-            }
-            const url = prompt("Cole o link direto da Imagem/GIF (.png, .jpg, .gif) ou do Vídeo (YouTube / .mp4):");
-            if (!url) return;
-
-            quillEditor.focus();
-            const range = quillEditor.getSelection(true) || { index: quillEditor.getLength() };
-
-            if (url.match(/\.(jpeg|jpg|gif|png|webp|svg)(\?.*)?$/i)) {
-                quillEditor.insertEmbed(range.index, 'image', url, 'user');
-            } else if (url.includes('youtube.com') || url.includes('youtu.be') || url.match(/\.(mp4|webm|ogg)(\?.*)?$/i)) {
-                let embedUrl = url;
-                if (url.includes('watch?v=')) {
-                    embedUrl = url.replace('watch?v=', 'embed/');
-                } else if (url.includes('youtu.be/')) {
-                    embedUrl = url.replace('youtu.be/', 'www.youtube.com/embed/');
-                }
-                quillEditor.insertEmbed(range.index, 'video', embedUrl, 'user');
-            } else {
-                quillEditor.insertEmbed(range.index, 'image', url, 'user');
-            }
-            quillEditor.setSelection(range.index + 1, 0, 'user');
-        }
-
-        function temConteudo(natureza) {
-            const artigo = artigosCache.find(a => a.id === natureza.artigo_id);
-            if (!artigo?.conteudo) return false;
-            const doc = new DOMParser().parseFromString(artigo.conteudo, 'text/html');
-            return Boolean(doc.body.textContent.replace(/[\s\u200b\u00a0]/g, '') || doc.querySelector('img[src], iframe[src], video[src]'));
-        }
-
-        function normalizar(texto) {
-            return String(texto || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-        }
-
-        function fecharPesquisa() {
-            document.getElementById('resultados-busca').classList.add('hidden');
-            document.getElementById('busca-input').setAttribute('aria-expanded', 'false');
-        }
-
-        function pesquisar(valor) {
-            const termo = normalizar(valor);
-            if (!termo) return fecharPesquisa();
-            const itens = naturezasCache.filter(n => String(n.id).includes(termo) || normalizar(n.natureza).includes(termo));
-            const container = document.getElementById('resultados-busca');
-            renderizarLista(itens, container, 'Nenhuma natureza encontrada. Tente outro código ou nome.');
-            container.classList.remove('hidden');
-            document.getElementById('busca-input').setAttribute('aria-expanded', 'true');
-        }
-
-        function filtrarSidebar() {
-            const sugestoes = naturezasCache.filter(temConteudo);
-            document.getElementById('contador-naturezas').textContent = `${sugestoes.length} ocorrências com conteúdo`;
-            renderizarLista(sugestoes.slice(0, 12), document.getElementById('lista-naturezas'), 'As sugestões aparecem quando houver artigos com conteúdo.');
-        }
-
-        function voltarInicio() {
-            cancelarEdicao();
-            naturezaAtualId = null;
-            document.getElementById('container-conteudo').classList.add('hidden');
-            document.getElementById('busca-input').value = '';
-            fecharPesquisa();
-            filtrarSidebar();
-            document.getElementById('busca-input').focus();
-        }
-
-        async function carregarDados() {
-            try {
-                const [resNat, resArt] = await Promise.all([
-                    supabaseClient.from('NATUREZAS').select('*').order('id', { ascending: true }),
-                    supabaseClient.from('ARTIGOS').select('*')
-                ]);
-
-                if (resNat.error) throw resNat.error;
-                if (resArt.error) throw resArt.error;
-
-                naturezasCache = resNat.data || [];
-                artigosCache = resArt.data || [];
-
-                document.getElementById('status-conexao').className = "text-xs px-3 py-1 rounded-full bg-emerald-900/50 text-emerald-400 border border-emerald-700";
-                document.getElementById('status-conexao').innerHTML = `<i class="fa-solid fa-circle text-[8px] mr-1"></i> Base disponível`;
-
-                filtrarSidebar();
-                if (naturezaAtualId) selecionarNatureza(naturezaAtualId, false);
-                if (document.getElementById('busca-input').value.trim()) pesquisar(document.getElementById('busca-input').value);
-            } catch (err) {
-                document.getElementById('contador-naturezas').textContent = 'Não foi possível carregar as sugestões.';
-                document.getElementById('lista-naturezas').innerHTML = '<button type="button" class="natureza-item" onclick="carregarDados()">Tentar novamente</button>';
-                document.getElementById('status-conexao').className = "text-xs px-3 py-1 rounded-full bg-rose-900/50 text-rose-400 border border-rose-700";
-                document.getElementById('status-conexao').innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Base indisponível`;
-            }
-        }
-
-        function renderizarLista(itens, listaEl = document.getElementById('lista-naturezas'), mensagem = 'Nenhuma natureza encontrada.') {
-            listaEl.replaceChildren();
-            if (!itens.length) {
-                const vazio = document.createElement('p');
-                vazio.className = 'empty-message';
-                vazio.textContent = mensagem;
-                listaEl.append(vazio);
-                return;
-            }
-            itens.forEach(nat => {
-                const item = document.createElement('button');
-                item.type = 'button';
-                item.className = 'natureza-item';
-                if (naturezaAtualId === nat.id) item.setAttribute('aria-current', 'page');
-                const codigo = document.createElement('span');
-                codigo.className = 'natureza-code';
-                codigo.textContent = nat.id;
-                const nome = document.createElement('span');
-                nome.textContent = nat.natureza;
-                item.append(codigo, nome);
-                item.onclick = () => { selecionarNatureza(nat.id); fecharPesquisa(); };
-                listaEl.append(item);
-            });
-        }
-
-        function selecionarNatureza(id, resetarEdicao = true) {
-            naturezaAtualId = id;
-            const nat = naturezasCache.find(n => n.id === id);
-            if (!nat) return;
-
-            document.getElementById('container-conteudo').classList.remove('hidden');
-
-            document.getElementById('tag-id-natureza').innerText = `ID: ${nat.id}`;
-            document.getElementById('titulo-natureza').innerText = nat.natureza;
-
-            const artigo = nat.artigo_id ? artigosCache.find(a => a.id === nat.artigo_id) : null;
-            const vinculadas = nat.artigo_id ? naturezasCache.filter(n => n.artigo_id === nat.artigo_id) : [];
-
-            const tagCount = document.getElementById('tag-vinculos-count');
-            const listaTags = document.getElementById('lista-vinculos-tags');
-            listaTags.innerHTML = '';
-
-            if (vinculadas.length > 1) {
-                tagCount.classList.remove('hidden');
-                tagCount.querySelector('span').innerText = vinculadas.length;
-                vinculadas.forEach(v => {
-                    const badge = document.createElement('span');
-                    badge.className = `text-[11px] px-2 py-0.5 rounded cursor-pointer border ${v.id === nat.id ? 'bg-blue-600/30 border-blue-500 text-blue-200' : 'bg-slate-700/70 border-slate-600 text-slate-300 hover:bg-slate-600'}`;
-                    badge.innerText = `${v.id} - ${v.natureza}`;
-                    badge.onclick = () => selecionarNatureza(v.id);
-                    listaTags.appendChild(badge);
-                });
-            } else {
-                tagCount.classList.add('hidden');
-            }
-
-            const modoLeitura = document.getElementById('modo-leitura');
-            if (artigo && artigo.conteudo && artigo.conteudo.trim() !== "") {
-                modoLeitura.innerHTML = `<div class="conteudo-renderizado">${artigo.conteudo}</div>`;
-            } else {
-                modoLeitura.innerHTML = `
-                    <div class="p-10 border border-dashed border-slate-700 rounded-xl text-center">
-                        <p class="text-slate-400 mb-3">Esta natureza ainda não possui informações cadastradas na Wiki.</p>
-                    </div>
-                `;
-            }
-
-            atualizarInterfacePermissoes();
-            if (resetarEdicao) cancelarEdicao();
-            filtrarSidebar();
-        }
-
-        function ativarEdicao() {
-            if (!podeEditar()) {
-                abrirModalAcesso('login');
-                return;
-            }
-            const nat = naturezasCache.find(n => n.id === naturezaAtualId);
-            if (!nat) return;
-
-            const artigo = nat.artigo_id ? artigosCache.find(a => a.id === nat.artigo_id) : null;
-            quillEditor.root.innerHTML = artigo ? (artigo.conteudo || '') : '';
-
-            document.getElementById('modo-leitura').classList.add('hidden');
-            document.getElementById('modo-edicao').classList.remove('hidden');
-            document.getElementById('botoes-acao').classList.add('hidden');
-            document.getElementById('botoes-edicao').classList.remove('hidden');
-            document.getElementById('painel-flutuante-edicao').classList.remove('hidden');
-        }
-
-        function cancelarEdicao() {
-            document.getElementById('modo-edicao').classList.add('hidden');
-            document.getElementById('modo-leitura').classList.remove('hidden');
-            document.getElementById('botoes-edicao').classList.add('hidden');
-            document.getElementById('botoes-acao').classList.remove('hidden');
-            document.getElementById('painel-flutuante-edicao').classList.add('hidden');
-        }
-
-        async function salvarConteudo() {
-            if (!podeEditar()) {
-                alert("Permissão Editor ou Admin necessária para salvar.");
-                return;
-            }
-            const nat = naturezasCache.find(n => n.id === naturezaAtualId);
-            if (!nat) return;
-
-            const btnSalvar = document.getElementById('btn-salvar');
-            btnSalvar.disabled = true;
-
-            try {
-                const html = quillEditor.root.innerHTML;
-                const titulo = nat.natureza || `Natureza #${nat.id}`;
-
-                if (nat.artigo_id) {
-                    const { error } = await supabaseClient
-                        .from('ARTIGOS')
-                        .update({ conteudo: html, updated_at: new Date().toISOString() })
-                        .eq('id', nat.artigo_id);
-                    if (error) throw error;
-                } else {
-                    const { data: novoArtigo, error: errInsert } = await supabaseClient
-                        .from('ARTIGOS')
-                        .insert({ titulo, conteudo: html })
-                        .select('id')
-                        .single();
-                    if (errInsert) throw errInsert;
-
-                    const { error: errLink } = await supabaseClient
-                        .from('NATUREZAS')
-                        .update({ artigo_id: novoArtigo.id })
-                        .eq('id', nat.id);
-                    if (errLink) throw errLink;
-                }
-
-                await carregarDados();
-                selecionarNatureza(nat.id, true);
-            } catch (err) {
-                alert("Erro ao salvar conteúdo: " + err.message);
-            } finally {
-                btnSalvar.disabled = false;
-            }
-        }
-
-        async function deletarConteudo() {
-            if (!podeExcluir()) {
-                alert("Apenas usuários com permissão de Admin podem excluir conteúdo.");
-                return;
-            }
-            const nat = naturezasCache.find(n => n.id === naturezaAtualId);
-            if (!nat || !nat.artigo_id) {
-                alert("Esta natureza não possui artigo vinculado para excluir.");
-                return;
-            }
-            if (!confirm("Tem certeza de que deseja excluir o conteúdo deste artigo?")) return;
-
-            try {
-                const { error } = await supabaseClient
-                    .from('ARTIGOS')
-                    .delete()
-                    .eq('id', nat.artigo_id);
-                if (error) throw error;
-
-                await carregarDados();
-                selecionarNatureza(nat.id, true);
-            } catch (err) {
-                alert("Erro ao excluir conteúdo: " + err.message);
-            }
-        }
-
-        function abrirModalVinculos() {
-            if (!podeEditar()) {
-                abrirModalAcesso('login');
-                return;
-            }
-            const nat = naturezasCache.find(n => n.id === naturezaAtualId);
-            if (!nat) return;
-
-            idsSelecionadosModal = new Set(
-                nat.artigo_id
-                    ? naturezasCache.filter(n => n.artigo_id === nat.artigo_id).map(n => n.id)
-                    : [nat.id]
-            );
-
-            document.getElementById('busca-modal-vinculo').value = '';
-            renderizarListaModal('');
-            document.getElementById('modal-vinculos').classList.remove('hidden');
-            document.getElementById('modal-vinculos').classList.add('flex');
-        }
-
-        function fecharModalVinculos() {
-            document.getElementById('modal-vinculos').classList.add('hidden');
-            document.getElementById('modal-vinculos').classList.remove('flex');
-        }
-
-        function renderizarListaModal(filtro) {
-            const termo = normalizar(filtro);
-            const box = document.getElementById('lista-modal-naturezas');
-            box.innerHTML = '';
-
-            const filtradas = naturezasCache.filter(n =>
-                !termo || String(n.id).includes(termo) || normalizar(n.natureza).includes(termo)
-            );
-
-            filtradas.forEach(item => {
-                const label = document.createElement('label');
-                label.className = 'flex items-center gap-2 p-1.5 rounded border border-transparent cursor-pointer text-xs';
-
-                const cb = document.createElement('input');
-                cb.type = 'checkbox';
-                cb.checked = idsSelecionadosModal.has(item.id);
-                cb.onchange = () => {
-                    if (cb.checked) idsSelecionadosModal.add(item.id);
-                    else idsSelecionadosModal.delete(item.id);
-                };
-
-                const span = document.createElement('span');
-                span.textContent = `${item.id} - ${item.natureza}`;
-
-                label.append(cb, span);
-                box.appendChild(label);
-            });
-        }
-
-        async function salvarVinculos() {
-            if (!podeEditar()) {
-                alert("Permissão Editor ou Admin necessária para vincular naturezas.");
-                return;
-            }
-            const nat = naturezasCache.find(n => n.id === naturezaAtualId);
-            if (!nat) return;
-
-            try {
-                let artigoId = nat.artigo_id;
-                if (!artigoId) {
-                    const { data, error } = await supabaseClient
-                        .from('ARTIGOS')
-                        .insert({ titulo: nat.natureza || `Natureza #${nat.id}`, conteudo: '' })
-                        .select('id')
-                        .single();
-                    if (error) throw error;
-                    artigoId = data.id;
-                }
-
-                const selecionados = new Set(idsSelecionadosModal);
-                selecionados.add(nat.id);
-
-                // Desvincula naturezas que antes apontavam para este artigo e foram desmarcadas
-                const antigas = naturezasCache.filter(n => n.artigo_id === artigoId && !selecionados.has(n.id)).map(n => n.id);
-                if (antigas.length > 0) {
-                    const { error: errUnlink } = await supabaseClient
-                        .from('NATUREZAS')
-                        .update({ artigo_id: null })
-                        .in('id', antigas);
-                    if (errUnlink) throw errUnlink;
-                }
-
-                // Vincula naturezas selecionadas ao artigo
-                const { error: errLink } = await supabaseClient
-                    .from('NATUREZAS')
-                    .update({ artigo_id: artigoId })
-                    .in('id', [...selecionados]);
-                if (errLink) throw errLink;
-
-                fecharModalVinculos();
-                await carregarDados();
-                selecionarNatureza(nat.id, true);
-            } catch (err) {
-                alert("Erro ao salvar vínculos: " + err.message);
-            }
-        }
-    </script>
+  </aside>
+</div>
+
+<div id="modal-acesso" class="modal hidden"><div>
+  <div class="end" style="justify-content:space-between"><h3 id="acesso-titulo">Entrar na Wiki</h3><button class="btn" onclick="fecharAcesso()">✕</button></div>
+  <div class="grp" style="width:100%"><button style="flex:1" onclick="abrirAcesso('login')">Entrar</button><button style="flex:1" onclick="abrirAcesso('cadastro')">Cadastrar (USER)</button></div>
+  <p class="muted" style="padding:0">Novos cadastros recebem o papel <b>USER</b> (somente leitura) até o Administrador liberar a edição.</p>
+  <form id="form-acesso" style="display:grid;gap:10px">
+    <input type="email" id="a-email" placeholder="E-mail" required>
+    <input type="password" id="a-senha" placeholder="Senha (mín. 6)" required minlength="6">
+    <p id="msg"></p>
+    <button type="submit" class="btn pri" id="a-ok" style="padding:10px">Entrar</button>
+  </form>
+</div></div>
+
+<div id="modal-vinculos" class="modal hidden"><div style="max-width:560px">
+  <h3><i class="fa-solid fa-link"></i> Vincular naturezas</h3>
+  <div id="v-ref" class="muted" style="padding:0"></div>
+  <input type="search" id="v-busca" placeholder="Filtrar por código ou nome...">
+  <div id="v-lista" class="lst"></div>
+  <div class="end"><button class="btn" onclick="fecharVinculos()">Cancelar</button><button class="btn pri" id="v-salvar" onclick="salvarVinculos()">Salvar vínculos</button></div>
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<script>
+const SB_URL='https://duubjdigfuhlmtuhgpfr.supabase.co';
+const SB_KEY='sb_publishable_ma6q8_9h13bFLgusXTeOjw_agSXsYq9';
+const BUCKET='midias';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+const $=id=>document.getElementById(id);
+const norm=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+let N=[],A=[],cur=null,quill=null,user=null,role=null,modo='login',sel=new Set(),size=17;
+const podeEditar=()=>role==='editor'||role==='admin';
+const podeExcluir=()=>role==='admin';
+
+/* ===== Tema e fonte (um único listener cada — antes havia dois, e o clique alternava duas vezes) ===== */
+function setTema(dark){
+  document.documentElement.dataset.theme=dark?'dark':'light';
+  $('tema').innerHTML=dark?'<i class="fa-solid fa-sun"></i>':'<i class="fa-solid fa-moon"></i>';
+  $('tema').setAttribute('aria-pressed',String(dark));
+  try{localStorage.setItem('copom_wiki_theme',dark?'dark':'light')}catch(_){}
+}
+function fonte(d){
+  size=Math.max(15,Math.min(27,size+d));
+  document.documentElement.style.setProperty('--read',size+'px');
+  $('tam').textContent=size+' px';
+  $('menos').disabled=size<=15;$('mais').disabled=size>=27;
+}
+$('tema').addEventListener('click',()=>setTema(document.documentElement.dataset.theme!=='dark'));
+$('menos').addEventListener('click',()=>fonte(-1));
+$('mais').addEventListener('click',()=>fonte(1));
+try{setTema(localStorage.getItem('copom_wiki_theme')==='dark')}catch(_){setTema(false)}
+fonte(0);
+
+/* ===== Permissões ===== */
+function uiPermissoes(){
+  const logado=user&&role;
+  const nome=role==='admin'?'Admin (edita e exclui)':role==='editor'?'Editor (edita)':'User (leitura)';
+  $('badge').innerHTML=logado?`<i class="fa-solid fa-user-check"></i> ${user.email} · <b>${nome}</b>`:'<i class="fa-solid fa-eye"></i> Leitura (sem login)';
+  $('btn-entrar').classList.toggle('hidden',!!logado);
+  $('btn-sair').classList.toggle('hidden',!logado);
+  $('btn-editar').disabled=!podeEditar();
+  $('btn-vincular').disabled=!podeEditar();
+  $('btn-excluir').disabled=!podeExcluir();
+  $('btn-editar').title=podeEditar()?'':'Requer permissão Editor ou Admin';
+  $('btn-excluir').title=podeExcluir()?'':'Requer permissão Admin';
+  if(!podeEditar()&&!$('edicao').classList.contains('hidden'))cancelarEdicao();
+}
+async function carregarPapel(u){
+  user=u||null;role=null;
+  if(user){
+    try{
+      const{data,error}=await sb.from('PERFIS_ACESSO').select('papel').eq('id',user.id).maybeSingle();
+      if(error)console.warn(error.message);
+      role=data?.papel||'user';
+    }catch(e){role='user'}
+  }
+  uiPermissoes();
+}
+function abrirAcesso(aba){
+  modo=aba;
+  $('acesso-titulo').textContent=aba==='login'?'Entrar na Wiki':'Criar conta (USER)';
+  $('a-ok').textContent=aba==='login'?'Entrar':'Criar conta';
+  $('msg').textContent='';
+  $('modal-acesso').classList.remove('hidden');
+}
+function fecharAcesso(){$('modal-acesso').classList.add('hidden')}
+async function sair(){await sb.auth.signOut();await carregarPapel(null)}
+$('form-acesso').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const email=$('a-email').value.trim(),password=$('a-senha').value;
+  $('a-ok').disabled=true;$('msg').textContent='Processando...';
+  try{
+    if(modo==='login'){
+      const{data,error}=await sb.auth.signInWithPassword({email,password});
+      if(error)throw error;
+      await carregarPapel(data.user);fecharAcesso();
+    }else{
+      const{data,error}=await sb.auth.signUp({email,password});
+      if(error)throw error;
+      if(data.session?.user){
+        await carregarPapel(data.session.user);fecharAcesso();
+        alert('Conta criada. Você só terá acesso a edições depois que o Administrador liberar.');
+      }else $('msg').textContent='Cadastro enviado! Confirme seu e-mail antes de entrar, se a confirmação estiver ativa.';
+    }
+  }catch(err){$('msg').textContent=err.message||'Falha na autenticação.'}
+  finally{$('a-ok').disabled=false}
+});
+
+/* ===== Dados ===== */
+function conteudoVazio(html){
+  if(!html)return true;
+  const d=new DOMParser().parseFromString(html,'text/html');
+  return !d.body.textContent.replace(/[\s\u200b\u00a0]/g,'')&&!d.querySelector('img[src],iframe[src],video[src]');
+}
+const artigoDe=n=>n&&n.artigo_id?A.find(a=>a.id===n.artigo_id):null;
+const temConteudo=n=>{const a=artigoDe(n);return !!a&&!conteudoVazio(a.conteudo)};
+
+async function carregarDados(){
+  try{
+    const[rn,ra]=await Promise.all([sb.from('NATUREZAS').select('*').order('id',{ascending:true}),sb.from('ARTIGOS').select('*')]);
+    if(rn.error)throw rn.error;if(ra.error)throw ra.error;
+    N=rn.data||[];A=ra.data||[];
+    $('status').innerHTML='<i class="fa-solid fa-circle" style="color:#16a34a;font-size:8px"></i> Base disponível';
+    atualizarSidebar();
+    if(cur)selecionar(cur,false);
+    if($('busca').value.trim())pesquisar($('busca').value);
+  }catch(err){
+    console.error(err);
+    $('contador').textContent='Não foi possível carregar os dados.';
+    $('lista').innerHTML='<button class="nav" onclick="carregarDados()">Tentar novamente</button>';
+    $('status').innerHTML='<i class="fa-solid fa-triangle-exclamation" style="color:#dc2626"></i> Base indisponível';
+  }
+}
+
+function renderLista(itens,el,vazio){
+  el.replaceChildren();
+  if(!itens.length){const p=document.createElement('p');p.className='muted';p.textContent=vazio;el.append(p);return}
+  itens.forEach(n=>{
+    const b=document.createElement('button');b.type='button';b.className='nav';
+    if(cur===n.id)b.setAttribute('aria-current','page');
+    const c=document.createElement('span');c.className='c';c.textContent=n.id;
+    const t=document.createElement('span');t.textContent=n.natureza;
+    b.append(c,t);b.onclick=()=>{selecionar(n.id);fecharBusca()};el.append(b);
+  });
+}
+function atualizarSidebar(){
+  const com=N.filter(temConteudo);
+  $('contador').textContent=`${com.length} ocorrências com conteúdo`;
+  renderLista(com.slice(0,40),$('lista'),'Ainda não há artigos com conteúdo.');
+  renderRecentes();
+}
+function resumoCurto(html){
+  const d=new DOMParser().parseFromString(html||'','text/html');
+  const t=(d.body.textContent||'').replace(/\s+/g,' ').trim();
+  if(!t)return d.querySelector('img,iframe,video')?'Contém mídia/anexo.':'Sem texto cadastrado.';
+  return t.length>140?t.slice(0,140)+'…':t;
+}
+const dataCurta=iso=>{const d=new Date(iso);return iso&&!isNaN(d)?d.toLocaleDateString('pt-BR'):''};
+function renderRecentes(){
+  const ul=$('recentes');ul.replaceChildren();
+  const arts=A.filter(a=>!conteudoVazio(a.conteudo)).sort((a,b)=>{
+    const ta=new Date(a.updated_at||a.created_at||0),tb=new Date(b.updated_at||b.created_at||0);
+    return tb-ta||(b.id-a.id);
+  }).slice(0,9);
+  if(!arts.length){ul.innerHTML='<li class="muted">Nenhum complemento publicado até o momento.</li>';return}
+  arts.forEach(a=>{
+    const n=N.find(x=>x.artigo_id===a.id);
+    const li=document.createElement('li'),b=document.createElement('button');
+    b.type='button';
+    const t=document.createElement('b');t.textContent=n?`${n.id} · ${n.natureza}`:(a.titulo||`Artigo #${a.id}`);
+    const s=document.createElement('span');s.textContent=resumoCurto(a.conteudo);
+    b.append(t,s);
+    const d=dataCurta(a.updated_at||a.created_at);
+    if(d){const m=document.createElement('small');m.textContent='Atualizado em '+d;b.append(m)}
+    if(n)b.onclick=()=>selecionar(n.id);
+    li.append(b);ul.append(li);
+  });
+}
+
+/* ===== Busca ===== */
+function fecharBusca(){$('res').classList.add('hidden')}
+function pesquisar(v){
+  const t=norm(v);
+  if(!t)return fecharBusca();
+  const itens=N.filter(n=>String(n.id).includes(t)||norm(n.natureza).includes(t)).slice(0,60);
+  renderLista(itens,$('res'),'Nenhuma natureza encontrada.');
+  $('res').classList.remove('hidden');
+}
+$('busca').addEventListener('input',e=>pesquisar(e.target.value));
+$('busca').addEventListener('keydown',e=>{
+  if(e.key==='Escape')fecharBusca();
+  if(e.key==='ArrowDown'){e.preventDefault();$('res').querySelector('button')?.focus()}
+});
+$('form-busca').addEventListener('submit',e=>{e.preventDefault();pesquisar($('busca').value)});
+document.addEventListener('click',e=>{if(!e.target.closest('.search'))fecharBusca()});
+
+/* ===== Navegação / artigo ===== */
+function voltarInicio(){
+  cancelarEdicao();cur=null;
+  $('artigo').classList.add('hidden');$('rail-art').classList.add('hidden');$('home').classList.remove('hidden');
+  $('busca').value='';fecharBusca();atualizarSidebar();window.scrollTo(0,0);
+}
+function montarToc(){
+  const toc=$('toc');toc.replaceChildren();
+  const hs=$('corpo').querySelectorAll('h1,h2,h3');let n=0;
+  hs.forEach((h,i)=>{
+    const t=h.textContent.trim();if(!t)return;n++;
+    h.id='topico-'+i;
+    const a=document.createElement('a');a.href='#topico-'+i;a.textContent=t;
+    if(h.tagName==='H3')a.className='h3';
+    a.onclick=e=>{e.preventDefault();h.scrollIntoView({behavior:'smooth',block:'start'})};
+    toc.append(a);
+  });
+  $('box-toc').classList.toggle('hidden',!n);
+}
+function selecionar(id,limpar=true){
+  const n=N.find(x=>x.id===id);if(!n)return;
+  cur=n.id;cancelarEdicao();
+  if(limpar){$('busca').value='';fecharBusca()}
+  $('home').classList.add('hidden');$('artigo').classList.remove('hidden');$('rail-art').classList.remove('hidden');
+  $('titulo').textContent=n.natureza;
+  const art=artigoDe(n);
+  const vinc=N.filter(x=>x.artigo_id&&x.artigo_id===n.artigo_id&&x.id!==n.id);
+  $('subtitulo').textContent=vinc.length?`Este artigo é compartilhado com ${vinc.length} ${vinc.length===1?'outra natureza':'outras naturezas'}.`:'Artigo exclusivo desta natureza.';
+  const tags=$('vinculos');tags.replaceChildren();
+  vinc.forEach(v=>{const b=document.createElement('button');b.type='button';b.textContent=`${v.id} · ${v.natureza}`;b.onclick=()=>selecionar(v.id);tags.append(b)});
+  $('f-cod').textContent=n.id;
+  $('f-art').textContent=art?'#'+art.id:'—';
+  $('f-vinc').textContent=vinc.length;
+  $('f-data').textContent=art?(dataCurta(art.updated_at||art.created_at)||'—'):'—';
+  const corpo=$('corpo');
+  if(art&&!conteudoVazio(art.conteudo))corpo.innerHTML=art.conteudo;
+  else corpo.innerHTML='<p class="empty">Nenhuma orientação cadastrada para esta natureza até o momento.</p>';
+  $('btn-excluir').classList.toggle('hidden',!(art&&art.conteudo));
+  montarToc();uiPermissoes();atualizarSidebar();
+  if(limpar)window.scrollTo(0,0);
+}
+
+/* ===== Edição ===== */
+function iniciarQuill(){
+  if(quill)return;
+  const P=Quill.import('parchment');
+  const Sz=Quill.import('attributors/style/size');Sz.whitelist=['12px','14px','16px','18px','20px','24px','32px'];Quill.register(Sz,true);
+  Quill.register(new P.ClassAttributor('fxestilo','fx-estilo',{scope:P.Scope.INLINE,whitelist:['arcoiris','brilho','neon','fogo','ouro','sombra','contorno']}),true);
+  Quill.register(new P.ClassAttributor('fxanim','fx-anim',{scope:P.Scope.INLINE,whitelist:['pulsar','tremer','quicar','flutuar','piscar','balancar','onda']}),true);
+  Quill.register(new P.Attributor('fxcolor','data-fxcolor',{scope:P.Scope.INLINE}),true);
+  quill=new Quill('#editor',{theme:'snow',modules:{toolbar:{
+    container:[[{header:[1,2,3,false]}],[{size:['12px','14px','16px','18px','20px','24px','32px']}],['bold','italic','underline','strike'],[{color:[]},{background:[]}],[{align:[]}],[{list:'ordered'},{list:'bullet'}],['blockquote','link','image','video'],['clean']],
+    handlers:{image:()=>$('arquivo').click(),video:inserirPorLink}
+  }}});
+  quill.getModule('toolbar').container.after($('fxstrip'));
+  quill.root.addEventListener('paste',async e=>{
+    const it=e.clipboardData&&e.clipboardData.items;if(!it)return;
+    for(const i of it){if(i.type.indexOf('image')!==-1){e.preventDefault();const f=i.getAsFile();if(f)await enviarArquivo(f)}}
+  });
+  $('arquivo').addEventListener('change',async e=>{const f=e.target.files[0];if(f)await enviarArquivo(f);e.target.value=''});
+}
+/* ===== Cor e efeitos de texto ===== */
+function corDigitando(v){if(!quill)return;quill.focus();quill.format('color',v,'user')}
+function resetCor(){if(!quill)return;quill.focus();quill.format('color',false,'user')}
+function fxAplicar(fmt,val){
+  if(!quill)return;quill.focus();
+  const r=quill.getSelection(true);
+  if(!r||!r.length){$('upst').textContent='Selecione um trecho de texto para aplicar o efeito.';return}
+  quill.format(fmt,val||false,'user');
+  const c=$('fx-cor').value;
+  if(val&&c&&fmt!=='fxcolor')quill.format('fxcolor',c,'user');
+}
+function limparFx(){
+  if(!quill)return;quill.focus();
+  const r=quill.getSelection(true);
+  if(r&&r.length){['fxestilo','fxanim','fxcolor'].forEach(f=>quill.format(f,false,'user'))}
+  ['fx-estilo','fx-anim','fx-cor'].forEach(i=>$(i).value='');
+}
+function ativarEdicao(){
+  if(!podeEditar())return alert('Acesso negado: apenas Editor ou Admin podem editar.');
+  const n=N.find(x=>x.id===cur);if(!n)return;
+  iniciarQuill();
+  quill.root.innerHTML=artigoDe(n)?.conteudo||'';
+  $('leitura').classList.add('hidden');$('edicao').classList.remove('hidden');
+  $('acts-leitura').classList.add('hidden');$('acts-edicao').classList.remove('hidden');
+}
+function cancelarEdicao(){
+  $('edicao').classList.add('hidden');$('leitura').classList.remove('hidden');
+  $('acts-edicao').classList.add('hidden');$('acts-leitura').classList.remove('hidden');
+  $('upst').textContent='Cole prints com Ctrl+V ou use o ícone de imagem na barra.';
+}
+async function enviarArquivo(file){
+  if(!podeEditar())return alert('Permissão Editor ou Admin necessária para enviar mídias.');
+  $('upst').textContent='Enviando mídia...';
+  try{
+    const ext=file.name?file.name.split('.').pop().toLowerCase():'png';
+    const nome=`wiki_${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+    const{error}=await sb.storage.from(BUCKET).upload(nome,file,{contentType:file.type||'image/png',cacheControl:'3600',upsert:false});
+    if(error)throw error;
+    const url=`${SB_URL}/storage/v1/object/public/${BUCKET}/${nome}`;
+    quill.focus();
+    const r=quill.getSelection(true)||{index:quill.getLength()};
+    quill.insertEmbed(r.index,'image',url,'user');quill.setSelection(r.index+1,0,'user');
+    $('upst').textContent='Mídia enviada!';
+  }catch(err){console.error(err);$('upst').textContent='Erro ao enviar mídia.';alert('Erro ao enviar: '+err.message)}
+}
+function inserirPorLink(){
+  if(!podeEditar())return alert('Permissão Editor ou Admin necessária.');
+  const url=prompt('Cole o link da imagem/GIF ou do vídeo (YouTube / .mp4):');if(!url)return;
+  quill.focus();const r=quill.getSelection(true)||{index:quill.getLength()};
+  if(/\.(jpe?g|gif|png|webp|svg)(\?.*)?$/i.test(url))quill.insertEmbed(r.index,'image',url,'user');
+  else if(/youtube\.com|youtu\.be|\.(mp4|webm|ogg)(\?.*)?$/i.test(url)){
+    let u=url;
+    if(u.includes('watch?v='))u=u.replace('watch?v=','embed/');
+    else if(u.includes('youtu.be/'))u=u.replace('youtu.be/','www.youtube.com/embed/');
+    quill.insertEmbed(r.index,'video',u,'user');
+  }else quill.insertEmbed(r.index,'image',url,'user');
+  quill.setSelection(r.index+1,0,'user');
+}
+async function salvarArtigo(){
+  if(!podeEditar())return alert('Acesso negado.');
+  const n=N.find(x=>x.id===cur);if(!n)return;
+  const b=$('btn-salvar');b.disabled=true;b.textContent='Salvando...';
+  try{
+    const html=quill.root.innerHTML;
+    if(conteudoVazio(html)){
+      if(n.artigo_id)await excluirArtigo(true);else cancelarEdicao();
+      return;
+    }
+    if(n.artigo_id){
+      const{error}=await sb.from('ARTIGOS').update({conteudo:html}).eq('id',n.artigo_id);
+      if(error)throw error;
+    }else{
+      const{data,error}=await sb.from('ARTIGOS').insert([{titulo:n.natureza,conteudo:html}]).select().single();
+      if(error)throw error;
+      const e2=await sb.from('NATUREZAS').update({artigo_id:data.id}).eq('id',n.id);
+      if(e2.error)throw e2.error;
+    }
+    await carregarDados();selecionar(n.id,false);cancelarEdicao();
+  }catch(err){console.error(err);alert('Erro ao salvar: '+err.message)}
+  finally{b.disabled=false;b.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Salvar alterações';uiPermissoes()}
+}
+async function excluirArtigo(silencioso=false){
+  if(!podeExcluir()){if(!silencioso)alert('Acesso negado: apenas Admin pode excluir.');return}
+  const n=N.find(x=>x.id===cur);if(!n||!n.artigo_id)return;
+  const qtd=N.filter(x=>x.artigo_id===n.artigo_id).length;
+  if(!silencioso&&!confirm(qtd>1?`Este artigo está vinculado a ${qtd} naturezas. Excluir o conteúdo de TODAS?`:'Tem certeza que deseja excluir o conteúdo desta natureza?'))return;
+  try{
+    const id=n.artigo_id;
+    const e1=await sb.from('NATUREZAS').update({artigo_id:null}).eq('artigo_id',id);
+    if(e1.error)throw e1.error;
+    const e2=await sb.from('ARTIGOS').delete().eq('id',id);
+    if(e2.error)throw e2.error;
+    await carregarDados();selecionar(n.id,false);cancelarEdicao();
+  }catch(err){console.error(err);if(!silencioso)alert('Erro ao excluir: '+err.message)}
+  finally{uiPermissoes()}
+}
+
+/* ===== Vínculos ===== */
+function abrirVinculos(){
+  if(!podeEditar())return alert('Acesso negado: apenas Editor ou Admin.');
+  const n=N.find(x=>x.id===cur);if(!n)return;
+  $('v-ref').innerHTML='';
+  const s=document.createElement('b');s.textContent=`${n.id} - ${n.natureza}`;
+  $('v-ref').append('Natureza de referência: ',s);
+  $('v-busca').value='';
+  sel=new Set([n.id]);
+  if(n.artigo_id)N.filter(x=>x.artigo_id===n.artigo_id).forEach(x=>sel.add(x.id));
+  listaVinculos('');
+  $('modal-vinculos').classList.remove('hidden');
+}
+function fecharVinculos(){$('modal-vinculos').classList.add('hidden')}
+function listaVinculos(f){
+  const box=$('v-lista');box.replaceChildren();
+  const t=norm(f);
+  const itens=N.filter(n=>String(n.id).includes(t)||norm(n.natureza).includes(t));
+  if(!itens.length){box.innerHTML='<p class="muted">Nenhuma natureza encontrada.</p>';return}
+  itens.forEach(n=>{
+    const l=document.createElement('label');
+    const c=document.createElement('input');c.type='checkbox';c.checked=sel.has(n.id);
+    c.onchange=()=>c.checked?sel.add(n.id):sel.delete(n.id);
+    const s=document.createElement('span');
+    s.textContent=`${n.id} - ${n.natureza}${n.artigo_id&&!sel.has(n.id)?' (já possui artigo)':''}`;
+    l.append(c,s);box.append(l);
+  });
+}
+$('v-busca').addEventListener('input',e=>listaVinculos(e.target.value));
+async function salvarVinculos(){
+  if(!podeEditar())return alert('Acesso negado.');
+  const n=N.find(x=>x.id===cur);if(!n)return;
+  sel.add(n.id);
+  const b=$('v-salvar');b.disabled=true;b.textContent='Vinculando...';
+  try{
+    let mestre=n.artigo_id;
+    if(!mestre)for(const id of sel){const x=N.find(y=>y.id===id);if(x?.artigo_id){mestre=x.artigo_id;break}}
+    if(!mestre){
+      const{data,error}=await sb.from('ARTIGOS').insert([{titulo:n.natureza,conteudo:''}]).select().single();
+      if(error)throw error;mestre=data.id;
+    }
+    const e1=await sb.from('NATUREZAS').update({artigo_id:mestre}).in('id',[...sel]);
+    if(e1.error)throw e1.error;
+    const saiu=N.filter(x=>x.artigo_id===mestre&&!sel.has(x.id)).map(x=>x.id);
+    if(saiu.length){const e2=await sb.from('NATUREZAS').update({artigo_id:null}).in('id',saiu);if(e2.error)throw e2.error}
+    fecharVinculos();await carregarDados();selecionar(n.id,false);
+  }catch(err){console.error(err);alert('Erro ao vincular: '+err.message)}
+  finally{b.disabled=false;b.textContent='Salvar vínculos'}
+}
+
+/* ===== Init ===== */
+sb.auth.onAuthStateChange((_e,s)=>{carregarPapel(s?.user||null)});
+(async()=>{
+  const{data}=await sb.auth.getSession();
+  await carregarPapel(data?.session?.user||null);
+  carregarDados();
+})();
+</script>
 </body>
 </html>
