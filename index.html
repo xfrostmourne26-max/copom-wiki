@@ -9,8 +9,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="icon" type="image/png" href="favicon.png">
 <style>
-:root{--bg:#f6f6f6;--paper:#fff;--ink:#202122;--muted:#54595d;--line:#c8ccd1;--soft:#eaf3ff;--link:#0645ad;--accent:#1e3a5f;--box:#f8f9fa;--read:17px;color-scheme:light}
-:root[data-theme=dark]{--bg:#101418;--paper:#171c22;--ink:#e3e8ee;--muted:#9aa7b8;--line:#2f3945;--soft:#1f2b3a;--link:#7fb0f0;--accent:#7aa2d6;--box:#1b2129;color-scheme:dark}
+:root{--bg:#f6f6f6;--paper:#fff;--ink:#202122;--muted:#54595d;--line:#c8ccd1;--soft:#eef2f6;--link:#0645ad;--accent:#1e3a5f;--box:#f8f9fa;--read:17px;color-scheme:light}
+:root[data-theme=dark]{--bg:#101418;--paper:#171c22;--ink:#e3e8ee;--muted:#9aa7b8;--line:#2f3945;--soft:#202731;--link:#7fb0f0;--accent:#7aa2d6;--box:#1b2129;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh}
 button{font:inherit;cursor:pointer;color:inherit}
@@ -28,26 +28,43 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 22px
 .search form:focus-within{outline:2px solid var(--accent)}
 .search input{flex:1;border:0;background:transparent;color:var(--ink);padding:9px 12px;font-size:14px;outline:0;min-width:0}
 .search button{border:0;background:var(--accent);color:#fff;padding:0 16px;font-weight:600}
-#res{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--paper);border:1px solid var(--line);border-radius:4px;box-shadow:0 10px 26px rgba(0,0,0,.2);max-height:340px;overflow:auto;padding:4px;z-index:60}
+
+/* Dropdown de pesquisa com fundo claro/escuro limpo e sem azul */
+#res{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#ffffff;color:#1e293b;border:1px solid #cbd5e1;border-radius:6px;box-shadow:0 12px 28px rgba(15,23,42,.18);max-height:390px;overflow:auto;padding:6px;z-index:60}
+:root[data-theme=dark] #res{background:#171c22;color:#e3e8ee;border-color:#2f3945;box-shadow:0 12px 28px rgba(0,0,0,.45)}
+.res-item{display:flex;flex-direction:column;gap:3px;width:100%;text-align:left;background:#ffffff;color:#1e293b;border:0;border-bottom:1px solid #e2e8f0;padding:8px 10px;border-radius:4px}
+:root[data-theme=dark] .res-item{background:#171c22;color:#e3e8ee;border-bottom-color:#26303b}
+.res-item:last-child{border-bottom:0}
+.res-item:hover,.res-item:focus-visible{background:#f1f5f9;outline:1px solid #cbd5e1}
+:root[data-theme=dark] .res-item:hover,:root[data-theme=dark] .res-item:focus-visible{background:#222a35;outline:1px solid #3b4856}
+.res-top{display:flex;align-items:center;gap:8px;font-size:13px}
+.res-badge{font:10px monospace;text-transform:uppercase;padding:2px 6px;border-radius:3px;background:#f8fafc;color:#475569;border:1px solid #cbd5e1;flex-shrink:0}
+:root[data-theme=dark] .res-badge{background:#1e252e;color:#9aa7b8;border-color:#2f3945}
+.res-title{color:inherit;font-weight:600}
+.res-snip{font-size:11.5px;color:#64748b;line-height:1.35}
+:root[data-theme=dark] .res-snip{color:#9aa7b8}
+
 .tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
 .grp{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--box)}
 .grp button,.grp span{background:none;border:0;border-right:1px solid var(--line);padding:5px 9px;font-size:12px;color:var(--muted)}
 .grp button:last-child{border-right:0}
-.grp button:hover:not(:disabled){background:var(--soft);color:var(--accent)}
+.grp button:hover:not(:disabled){background:var(--soft);color:var(--ink)}
 .chip{border:1px solid var(--line);background:var(--box);border-radius:4px;padding:5px 9px}
 .btn{border:1px solid var(--line);background:var(--box);border-radius:4px;padding:6px 11px;font-size:12px}
-.btn:hover:not(:disabled){background:var(--soft);color:var(--accent)}
+.btn:hover:not(:disabled){background:var(--soft);color:var(--ink)}
 .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn.pri:hover:not(:disabled){background:var(--accent);color:#fff;filter:brightness(1.15)}
+.btn.pri:hover:not(:disabled){background:var(--accent);color:#fff;filter:brightness(1.12)}
+.btn.warn{background:#fffbeb;color:#92400e;border-color:#f59e0b}
+.btn.warn:hover:not(:disabled){background:#fef3c7}
 .btn.danger{color:#b32424;border-color:#d9a3a3}
 /* layout */
-.wrap{display:grid;grid-template-columns:220px minmax(0,1fr) 290px;gap:0;max-width:1680px;margin:0 auto;padding:0 0 40px}
+.wrap{display:grid;grid-template-columns:245px minmax(0,1fr) 300px;gap:0;max-width:1680px;margin:0 auto;padding:0 0 40px}
 .side{padding:18px 16px;font-size:13px;position:sticky;top:62px;align-self:start;max-height:calc(100vh - 62px);overflow:auto}
 .side h3{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line)}
 .side h3:first-child{margin-top:0}
 .nav{display:flex;gap:8px;width:100%;text-align:left;background:none;border:0;padding:5px 6px;border-radius:3px;color:var(--link);font-size:13px;line-height:1.35}
 .nav:hover,.nav[aria-current]{background:var(--soft);text-decoration:underline}
-.nav .c{font:11px monospace;color:var(--muted);min-width:30px;padding-top:1px}
+.nav .c{font:11px monospace;color:var(--muted);min-width:32px;padding-top:1px;flex-shrink:0}
 .muted{color:var(--muted);font-size:12px;padding:6px}
 main{background:var(--paper);border:1px solid var(--line);border-width:0 1px;min-height:calc(100vh - 62px);padding:22px 44px 50px;min-width:0}
 .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:-4px 0 14px;font-size:13px;flex-wrap:wrap}
@@ -75,7 +92,7 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
 .art.ql-editor a{color:var(--link)}
 .art.ql-editor blockquote{border-left:4px solid var(--line);color:var(--muted)}
 .empty{color:var(--muted);font-style:italic}
-#editor .ql-editor{min-height:60vh;font-size:var(--read);line-height:1.7}
+#editor .ql-editor{min-height:36vh;font-size:var(--read);line-height:1.7}
 .ql-toolbar.ql-snow,.ql-container.ql-snow{border-color:var(--line)!important;background:var(--paper);color:var(--ink)}
 .ql-toolbar.ql-snow{position:sticky;top:62px;z-index:20;background:var(--box)}
 :root[data-theme=dark] .ql-snow .ql-stroke{stroke:var(--ink)}
@@ -83,6 +100,109 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
 :root[data-theme=dark] .ql-snow .ql-picker{color:var(--ink)}
 .ql-snow .ql-picker-options{background:var(--paper)}
 #upst{font-size:12px;color:var(--muted);margin:6px 0}
+
+/* Formulário, pontuação dinâmica, contestação e assinaturas */
+.form-start-card{border:1px solid var(--line);background:var(--box);border-radius:6px;padding:22px;max-width:820px;display:grid;gap:12px}
+.form-start-card h2{margin:0;font:700 21px Georgia,serif}
+.ficha-lista{display:grid;gap:8px;margin-top:6px}
+.ficha-card{border:1px solid var(--line);background:var(--paper);border-radius:5px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}
+.status-pill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid var(--line);background:var(--box)}
+.status-pill.finalizada{background:#dcfce7;color:#166534;border-color:#86efac}
+.status-pill.enviada{background:#fef9c3;color:#854d0e;border-color:#fde047}
+.status-pill.contestada{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+
+.form-sheet{--f-header:#1e3a5f;--f-accent:#1e3a5f;--f-bg:#ffffff;--f-ink:#1f2937;--f-border:#cbd5e1;background:var(--f-bg);color:var(--f-ink);border:1px solid var(--f-border);border-radius:6px;overflow:hidden;max-width:980px}
+.form-sheet.formato-compacto{font-size:13px}
+.form-sheet.formato-padrao{font-size:14px}
+.form-sheet.formato-amplo{font-size:15.5px}
+.form-banner{background:var(--f-header);color:#fff;padding:16px 20px}
+.form-banner h2{margin:0 0 4px;font:700 18.5px/1.25 Arial,sans-serif;letter-spacing:.02em;text-transform:uppercase}
+.form-banner p{margin:0;font-size:12.5px;opacity:.92}
+.form-assign-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:11px 16px;background:#f1f5f9;color:#0f172a;border-bottom:1px solid var(--f-border);font-size:12.5px}
+.form-assign-bar input,.form-assign-bar select{padding:6px 9px;border:1px solid #94a3b8;border-radius:4px;background:#fff;color:#0f172a;font-size:12.5px}
+
+.score-summary-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:11px 16px;background:#eff6ff;color:#0f172a;border-bottom:1px solid var(--f-border);font-size:13px}
+.score-summary-bar.zero-alert{background:#fef2f2;color:#7f1d1d;border-bottom-color:#fca5a5}
+.score-num-input{width:76px;padding:4px 7px;border:1px solid #64748b;border-radius:4px;background:#fff;color:#0f172a;font-weight:700;text-align:center}
+
+.form-meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px solid var(--f-border);background:#fff}
+@media(max-width:820px){.form-meta-grid{grid-template-columns:1fr}}
+.form-meta-cell{padding:10px 14px;border-right:1px solid var(--f-border);border-bottom:1px solid var(--f-border);display:grid;gap:6px}
+.form-meta-cell:nth-child(3n){border-right:0}
+.form-meta-head{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--f-header)}
+
+.form-sec{margin:16px;border:1px solid var(--f-border);border-radius:6px;overflow:hidden;background:rgba(255,255,255,.92)}
+.form-sec-title{background:color-mix(in srgb,var(--f-accent) 11%,transparent);color:var(--f-header);font-weight:700;padding:8px 14px;border-bottom:1px solid var(--f-border);font-size:14px}
+
+.form-q-row{display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid color-mix(in srgb,var(--f-border) 55%,transparent);align-items:flex-start}
+.form-q-row:last-child{border-bottom:0}
+.form-lead-check{margin-top:2px;flex-shrink:0}
+.form-lead-check input{display:none}
+.form-lead-box{width:19px;height:19px;border:1.6px solid var(--f-header);border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:transparent;background:#fff;cursor:pointer}
+.form-lead-check input:checked + .form-lead-box{background:var(--f-accent);color:#fff}
+.form-lead-check input:disabled + .form-lead-box{cursor:not-allowed;opacity:.75}
+
+.form-q-body{flex:1;min-width:0;display:grid;gap:6px}
+.form-q-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.form-q-label{font-weight:600}
+.perm-tag{font-size:10px;padding:1px 6px;border-radius:3px;background:#e2e8f0;color:#334155;font-weight:600;white-space:nowrap}
+.perm-tag.user-ok{background:#dbeafe;color:#1d4ed8}
+
+.align-box{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}
+.align-desc{flex:1;min-width:220px;line-height:1.5}
+.align-desc small{display:block;color:#475569;font-size:12px;margin-top:2px}
+.align-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.pts-edit-inp{width:54px;border:1px solid #94a3b8;border-radius:4px;padding:2px 5px;font-size:12px;font-weight:700;text-align:center;background:#fff;color:#0f172a}
+
+.inline-flow{display:flex;flex-wrap:wrap;align-items:center;gap:5px 7px;line-height:1.7}
+.inline-input{border:0;border-bottom:1.5px solid #475569;background:transparent;color:inherit;padding:1px 4px;font:inherit;outline:none;min-width:44px;text-align:center}
+.inline-input.wide{text-align:left;min-width:160px}
+.inline-input.dashed{border-bottom:1.5px dashed #64748b;text-align:left;min-width:220px}
+.inline-input:focus{border-bottom-color:var(--f-accent);background:rgba(59,130,246,.06)}
+.inline-input:disabled{opacity:.8;cursor:not-allowed;border-bottom-style:dotted}
+
+.form-dashed-line{width:100%;border:0;border-bottom:1.5px dashed #64748b;background:transparent;color:inherit;padding:4px 2px;font:inherit;outline:none}
+.form-dashed-line:focus{border-bottom-color:var(--f-accent);background:rgba(59,130,246,.05)}
+.form-dashed-line:disabled{opacity:.8;cursor:not-allowed}
+
+.form-line-input{width:100%;border:0;border-bottom:1.5px solid #64748b;background:transparent;color:inherit;padding:3px 2px;font:inherit;outline:none}
+.form-line-input:focus{border-bottom-color:var(--f-accent)}
+.form-line-input:disabled{opacity:.8;cursor:not-allowed;border-bottom-style:dotted}
+
+.form-opts{display:inline-flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.x-choice{display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-size:13.5px;user-select:none}
+.x-choice.disabled{cursor:not-allowed;opacity:.8}
+.x-choice input{display:none}
+.x-box{width:18px;height:18px;border:1.5px solid var(--f-accent);border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11.5px;color:transparent;background:#fff;flex-shrink:0}
+.x-choice input:checked + .x-box{background:var(--f-accent);color:#fff}
+
+.form-table-wrap{overflow-x:auto;padding:10px 14px}
+.form-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.form-table th{background:var(--f-header);color:#fff;padding:7px 8px;border:1px solid var(--f-border);text-align:left;font-weight:600}
+.form-table td{border:1px solid var(--f-border);padding:5px 7px}
+.form-table input{width:100%;border:0;background:transparent;color:inherit;font:inherit;outline:none;padding:2px}
+.form-table input:disabled{cursor:not-allowed;opacity:.8}
+
+.contest-box{margin:16px;border:1px solid #f59e0b;background:#fffbeb;color:#451a03;border-radius:6px;padding:12px 14px;display:grid;gap:8px}
+.contest-box b{color:#92400e}
+
+.form-sign-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;padding:26px 20px 18px;background:#fff}
+@media(max-width:720px){.form-sign-grid{grid-template-columns:1fr}}
+.form-sign-box{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.form-sign-input{width:100%;border:0;border-bottom:1.5px solid #475569;background:transparent;color:inherit;text-align:center;font:inherit;padding:4px 6px;outline:none}
+.form-sign-input:focus{border-bottom-color:var(--f-accent)}
+.form-sign-input:disabled{opacity:.85;cursor:not-allowed}
+.form-sign-caption{font-size:12px;color:#334155}
+
+.form-actions-bar{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;border-top:1px solid var(--f-border);background:rgba(15,23,42,.03)}
+
+/* Builder de formulário no editor */
+.builder-box{border:1px solid var(--line);background:var(--box);border-radius:6px;padding:14px;margin-top:14px;display:grid;gap:12px}
+.builder-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px}
+.builder-item{border:1px solid var(--line);background:var(--paper);border-radius:4px;padding:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px}
+.syntax-help{font-size:12px;color:var(--muted);background:var(--paper);border:1px dashed var(--line);border-radius:4px;padding:8px 10px;line-height:1.5}
+.syntax-help code{background:var(--box);padding:1px 5px;border-radius:3px;border:1px solid var(--line);font-size:11.5px;color:var(--ink)}
+
 /* right rail */
 .box{border:1px solid var(--line);background:var(--box);font-size:13px;margin-bottom:16px}
 .box h3{margin:0;padding:7px 12px;background:var(--soft);border-bottom:1px solid var(--line);font-size:13px;text-align:center}
@@ -97,11 +217,12 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
 .modal>div{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:20px;width:100%;max-width:480px;display:grid;gap:12px}
 .modal h3{margin:0}
-.modal input[type=email],.modal input[type=password],.modal input[type=search]{width:100%;padding:9px;border:1px solid var(--line);border-radius:4px;background:var(--box);color:var(--ink)}
+.modal input[type=email],.modal input[type=password],.modal input[type=search],.modal input[type=text],.modal select{width:100%;padding:9px;border:1px solid var(--line);border-radius:4px;background:var(--box);color:var(--ink)}
+.field{display:grid;gap:4px;font-size:12px;color:var(--muted)}
 .lst{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:4px;padding:6px}
 .lst label{display:flex;gap:8px;padding:5px;font-size:13px;cursor:pointer;border-radius:3px}.lst label:hover{background:var(--soft)}
 .end{display:flex;justify-content:flex-end;gap:8px}
-#msg{font-size:12px;color:#b45309;min-height:16px}
+#msg,#t-msg{font-size:12px;color:#b45309;min-height:16px}
 /* efeitos de texto */
 [data-fxcolor=vermelho]{--fx:#ef4444}[data-fxcolor=laranja]{--fx:#f97316}[data-fxcolor=amarelo]{--fx:#eab308}[data-fxcolor=verde]{--fx:#22c55e}[data-fxcolor=ciano]{--fx:#06b6d4}[data-fxcolor=azul]{--fx:#3b82f6}[data-fxcolor=roxo]{--fx:#a855f7}[data-fxcolor=rosa]{--fx:#ec4899}[data-fxcolor=branco]{--fx:#fff}
 .fx-estilo-arcoiris{background:linear-gradient(90deg,#ef4444,#f59e0b,#10b981,#3b82f6,#8b5cf6,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent!important;font-weight:700}
@@ -112,8 +233,7 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
 .fx-estilo-sombra{color:var(--fx,inherit);text-shadow:2px 3px 6px rgba(0,0,0,.45)}
 .fx-estilo-contorno{color:transparent!important;-webkit-text-stroke:1px var(--fx,var(--accent));font-weight:700}
 @keyframes fxP{50%{transform:scale(1.06)}}@keyframes fxT{25%{transform:translateX(-2px) rotate(-.6deg)}75%{transform:translateX(2px) rotate(.6deg)}}
-@keyframes fxQ{50%{transform:translateY(-5px)}}@keyframes fxF{50%{transform:translateY(-3px)}}@keyframes fxPi{50%{opacity:.35}}
-@keyframes fxB{25%{transform:rotate(-2.5deg)}75%{transform:rotate(2.5deg)}}@keyframes fxO{50%{letter-spacing:.06em}}
+@keyframes fxQ{50%{transform:translateY(-5px)}}@keyframes fxF{50%{transform:translateY(-3px)}}@keyframes fxPi{50%{opacity:.35}}@keyframes fxB{25%{transform:rotate(-2.5deg)}75%{transform:rotate(2.5deg)}}@keyframes fxO{50%{letter-spacing:.06em}}
 [class*=fx-anim-]{display:inline-block;color:var(--fx,inherit)}
 .fx-anim-pulsar{animation:fxP 1.8s ease-in-out infinite}.fx-anim-tremer{animation:fxT .35s linear infinite}.fx-anim-quicar{animation:fxQ 1s ease-in-out infinite}.fx-anim-flutuar{animation:fxF 2.4s ease-in-out infinite}.fx-anim-piscar{animation:fxPi 1.2s step-end infinite}.fx-anim-balancar{animation:fxB 1.6s ease-in-out infinite}.fx-anim-onda{animation:fxO 2s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){[class*=fx-anim-]{animation:none!important}}
@@ -134,7 +254,7 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
   </button>
   <div class="search">
     <form id="form-busca" role="search">
-      <input id="busca" type="search" placeholder="Buscar por código ou nome da natureza..." autocomplete="off" aria-controls="res">
+      <input id="busca" type="search" placeholder="Buscar por código, natureza, formulário, palavra-chave ou trecho..." autocomplete="off" aria-controls="res">
       <button type="submit">Buscar</button>
     </form>
     <div id="res" class="hidden" role="region" aria-label="Resultados"></div>
@@ -147,7 +267,7 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
       <button type="button" id="tema" title="Alternar tema claro/escuro" aria-label="Alternar tema"><i class="fa-solid fa-moon"></i></button>
     </div>
     <a class="btn" id="copomplus" href="https://copomplus.vercel.app/" target="_blank" rel="noopener noreferrer" style="text-decoration:none"><i class="fa-solid fa-up-right-from-square"></i> COPOMPLUS</a>
-    <span id="badge" class="chip"><i class="fa-solid fa-eye"></i> Leitura (sem login)</span>
+    <span id="badge" class="chip"><i class="fa-solid fa-eye"></i> Desconectado</span>
     <button class="btn pri" id="btn-entrar" onclick="abrirAcesso('login')"><i class="fa-solid fa-user-lock"></i> Entrar / Cadastrar</button>
     <button class="btn hidden" id="btn-sair" onclick="sair()"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
     <span id="status" class="chip">Conectando...</span>
@@ -157,6 +277,12 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
 <div class="wrap">
   <aside class="side" aria-label="Navegação">
     <button class="nav" onclick="voltarInicio()"><i class="fa-solid fa-house"></i> Página inicial</button>
+
+    <h3>Tópicos e rotinas do COPOM</h3>
+    <button class="btn pri" id="btn-novo-topico" style="width:100%;margin-bottom:8px" onclick="abrirNovoTopico()"><i class="fa-solid fa-plus"></i> Novo artigo / tópico</button>
+    <div id="contador-topicos" class="muted">Carregando...</div>
+    <div id="lista-topicos"></div>
+
     <h3>Ocorrências com conteúdo</h3>
     <div id="contador" class="muted">Carregando...</div>
     <div id="lista"></div>
@@ -165,39 +291,153 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
   <main>
     <section id="home" class="hero">
       <p class="muted" style="padding:0;text-transform:uppercase;letter-spacing:.08em;font-weight:700">Copom-Wiki</p>
-      <h1>Base de naturezas de ocorrências</h1>
-      <p>Consulte padrões operacionais, procedimentos e orientações por código ou nome da natureza. Use a busca no topo ou escolha uma das páginas recentes abaixo.</p>
-      <h2 class="sec"><i class="fa-solid fa-clock-rotate-left"></i> Últimos complementos</h2>
+      <h1>Base de naturezas, tópicos e formulários</h1>
+      <p>Consulte padrões operacionais, fichas/formulários do COPOM e orientações por código ou nome da natureza. Use a busca no topo por palavras-chave, títulos de formulários ou trechos de texto.</p>
+      <h2 class="sec"><i class="fa-solid fa-clock-rotate-left"></i> Últimos complementos e tópicos</h2>
       <ul id="recentes" class="recent"></ul>
     </section>
 
     <article id="artigo" class="hidden">
-      <div class="tabs"><span>Artigo</span></div>
+      <div class="tabs"><span id="aba-tipo">Artigo</span></div>
       <h1 class="title" id="titulo"></h1>
       <div class="sub" id="subtitulo"></div>
       <div id="vinculos" class="tags"></div>
-      <div id="leitura"><div id="corpo" class="art ql-editor"></div></div>
+
+      <div id="leitura">
+        <div id="form-start-screen" class="form-start-card hidden"></div>
+        <div id="form-runner" class="hidden"></div>
+        <div id="corpo" class="art ql-editor"></div>
+      </div>
+
       <div id="edicao" class="hidden">
         <div id="editor"></div>
         <div id="fxstrip" class="fxstrip" role="group" aria-label="Cor e efeitos de texto">
-  <span class="it"><label for="cor-dig">Cor ao digitar</label><input type="color" id="cor-dig" value="#38bdf8" oninput="corDigitando(this.value)"><button type="button" class="btn" style="padding:0 6px;border:0;background:none;text-decoration:underline" onclick="resetCor()">Reset</button></span>
-  <span class="it"><label for="fx-estilo">Efeito</label><select id="fx-estilo" onchange="fxAplicar('fxestilo',this.value)"><option value="">Nenhum</option><option value="arcoiris">Rainbow</option><option value="brilho">Brilho</option><option value="neon">Neon</option><option value="fogo">Fogo</option><option value="ouro">Ouro</option><option value="sombra">Sombra</option><option value="contorno">Contorno</option></select></span>
-  <span class="it"><label for="fx-anim">Animação</label><select id="fx-anim" onchange="fxAplicar('fxanim',this.value)"><option value="">Nenhuma</option><option value="pulsar">Pulsar</option><option value="quicar">Quicar</option><option value="flutuar">Flutuar</option><option value="balancar">Balançar</option><option value="tremer">Tremer</option><option value="piscar">Piscar</option><option value="onda">Onda</option></select></span>
-  <span class="it"><label for="fx-cor">Cor FX</label><select id="fx-cor" onchange="fxAplicar('fxcolor',this.value)"><option value="">Padrão</option><option value="vermelho">Vermelho</option><option value="laranja">Laranja</option><option value="amarelo">Amarelo</option><option value="verde">Verde</option><option value="ciano">Ciano</option><option value="azul">Azul</option><option value="roxo">Roxo</option><option value="rosa">Rosa</option><option value="branco">Branco</option></select></span>
-  <button type="button" class="btn" onclick="limparFx()">Limpar FX</button>
-</div>
+          <span class="it"><label for="cor-dig">Cor ao digitar</label><input type="color" id="cor-dig" value="#38bdf8" oninput="corDigitando(this.value)"><button type="button" class="btn" style="padding:0 6px;border:0;background:none;text-decoration:underline" onclick="resetCor()">Reset</button></span>
+          <span class="it"><label for="fx-estilo">Efeito</label><select id="fx-estilo" onchange="fxAplicar('fxestilo',this.value)"><option value="">Nenhum</option><option value="arcoiris">Rainbow</option><option value="brilho">Brilho</option><option value="neon">Neon</option><option value="fogo">Fogo</option><option value="ouro">Ouro</option><option value="sombra">Sombra</option><option value="contorno">Contorno</option></select></span>
+          <span class="it"><label for="fx-anim">Animação</label><select id="fx-anim" onchange="fxAplicar('fxanim',this.value)"><option value="">Nenhuma</option><option value="pulsar">Pulsar</option><option value="quicar">Quicar</option><option value="flutuar">Flutuar</option><option value="balancar">Balançar</option><option value="tremer">Tremer</option><option value="piscar">Piscar</option><option value="onda">Onda</option></select></span>
+          <span class="it"><label for="fx-cor">Cor FX</label><select id="fx-cor" onchange="fxAplicar('fxcolor',this.value)"><option value="">Padrão</option><option value="vermelho">Vermelho</option><option value="laranja">Laranja</option><option value="amarelo">Amarelo</option><option value="verde">Verde</option><option value="ciano">Ciano</option><option value="azul">Azul</option><option value="roxo">Roxo</option><option value="rosa">Rosa</option><option value="branco">Branco</option></select></span>
+          <button type="button" class="btn" onclick="limparFx()">Limpar FX</button>
+        </div>
         <div id="upst">Cole prints com Ctrl+V ou use o ícone de imagem na barra.</div>
         <input type="file" id="arquivo" accept="image/*" class="hidden">
+
+        <div class="builder-box">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+            <label style="display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer">
+              <input type="checkbox" id="chk-eh-form" onchange="toggleFormBuilder(this.checked)">
+              <span>Transformar este item em Formulário / Ficha de Qualidade</span>
+            </label>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <button type="button" class="btn pri" onclick="aplicarModeloManual190P4a6()"><i class="fa-solid fa-file-shield"></i> Modelo Manual 190 (Pág. 4 a 6)</button>
+              <button type="button" class="btn" onclick="aplicarModeloMonitoriaSemanal()"><i class="fa-solid fa-clipboard-check"></i> Monitoria Semanal (Fase 3)</button>
+              <button type="button" class="btn" onclick="aplicarModeloFicha190()"><i class="fa-solid fa-wand-magic-sparkles"></i> Evolução Mensal</button>
+            </div>
+          </div>
+
+          <div id="form-builder-panel" class="hidden" style="display:grid;gap:12px">
+            <div class="builder-grid">
+              <label class="field">Subtítulo do cabeçalho
+                <input type="text" id="fb-subtitulo" placeholder="Ex.: Sistema Integrado de Qualidade e Eficiência Operacional - 190">
+              </label>
+              <label class="field">Cor do cabeçalho
+                <input type="color" id="fb-header-cor" value="#1e3a5f" style="width:100%;height:34px">
+              </label>
+              <label class="field">Cor de destaque / bordas
+                <input type="color" id="fb-accent-cor" value="#1e3a5f" style="width:100%;height:34px">
+              </label>
+              <label class="field">Cor de fundo da ficha
+                <input type="color" id="fb-bg-cor" value="#ffffff" style="width:100%;height:34px">
+              </label>
+              <label class="field">Formato / tamanho
+                <select id="fb-formato">
+                  <option value="padrao">Padrão</option>
+                  <option value="compacto">Compacto</option>
+                  <option value="amplo">Amplo</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="syntax-help">
+              <b>Pontuação dinâmica e regra de nota zero:</b><br>
+              • Em itens de <code>Alinhamento / Critério</code>, informe os pontos em <b>Pontos</b> (ex.: <code>10</code> ou <code>15 pts</code>). A nota é calculada dinamicamente (ignorando <code>N/A</code> proporcionalmente) e pode ser editada na ficha.<br>
+              • Se qualquer <b>Penalidade Crítica (Tolerância Zero)</b> for marcada, a nota vai automaticamente para <b>0</b> (`0 / 100 pts`) por infração crítica.
+            </div>
+
+            <div style="border-top:1px solid var(--line);padding-top:10px;display:grid;gap:8px">
+              <b>Adicionar item ao formulário</b>
+              <div class="builder-grid">
+                <label class="field">Tipo de item
+                  <select id="fb-tipo" onchange="ajustarCamposConstrutor()">
+                    <option value="alinhamento">Alinhamento / Critério (com pontos dinâmicos)</option>
+                    <option value="linha_mista">Linha mista (texto + [campo] + [linha] + [x:Opção])</option>
+                    <option value="fechamento_alinhamento">Fechamento / Alinhamento final</option>
+                    <option value="linha_tracejada">Linha tracejada simples</option>
+                    <option value="grade_topo">Célula da grade superior (Identificação)</option>
+                    <option value="assinaturas">Bloco de assinaturas (2 colunas no rodapé)</option>
+                    <option value="campo">Campo de texto simples</option>
+                    <option value="x_unica">Marcar X (1 opção)</option>
+                    <option value="x_multipla">Marcar X (1 ou mais opções)</option>
+                    <option value="tabela">Tabela de linhas</option>
+                  </select>
+                </label>
+                <label class="field">Quem preenche
+                  <select id="fb-quem-preenche">
+                    <option value="qualidade">Equipe / Gestão</option>
+                    <option value="usuario">Usuário pode preencher</option>
+                  </select>
+                </label>
+                <label class="field" id="wrap-fb-secao">Seção / Bloco
+                  <input type="text" id="fb-secao" value="Alinhamento e Preenchimento Final" placeholder="Ex.: Bloco 1 / Penalidades Críticas">
+                </label>
+                <label class="field" id="wrap-fb-pontos">Pontos (valor dinâmico)
+                  <input type="text" id="fb-pontos" placeholder="Ex.: 10 ou 15 pts">
+                </label>
+                <label class="field" id="wrap-fb-check-esq">Caixinha [ ] à esquerda?
+                  <select id="fb-check-esq">
+                    <option value="nao">Não</option>
+                    <option value="sim">Sim</option>
+                  </select>
+                </label>
+                <label class="field" id="wrap-fb-rotulo" style="grid-column:1/-1">Título / Descrição do alinhamento ou linha
+                  <input type="text" id="fb-rotulo" placeholder="Ex.: 1.1 Prontidão e Abertura — Atendeu em até 3-5s com fraseologia padrão">
+                </label>
+                <label class="field" id="wrap-fb-detalhe" style="grid-column:1/-1">Detalhe / Orientação complementar (opcional)
+                  <input type="text" id="fb-detalhe" placeholder="Ex.: Alinhamento sobre corte de relatos longos e confirmação de endereço">
+                </label>
+                <label class="field" id="wrap-fb-opcoes">Opções separadas por vírgula
+                  <input type="text" id="fb-opcoes" value="Sim, Não, N/A" placeholder="Ex.: Sim, Não, N/A">
+                </label>
+                <label class="field" id="wrap-fb-colunas">Colunas da tabela (vírgula)
+                  <input type="text" id="fb-colunas" value="Data, Protocolo CAD, Duração, Nota Final, Principal Ponto Observado">
+                </label>
+                <label class="field hidden" id="wrap-fb-assinaturas" style="grid-column:1/-1">Assinaturas (2 legendas separadas por |)
+                  <input type="text" id="fb-assinaturas" value="Assinatura do Supervisor / Auditor de Qualidade | Ciente do Operador Auditado (Data: ____/____/2026)">
+                </label>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <button type="button" class="btn pri" onclick="adicionarItemFormulario()"><i class="fa-solid fa-plus"></i> Adicionar item</button>
+                <button type="button" class="btn" onclick="inserirAtalhoModelo('[campo:60]')">+ [campo:60]</button>
+                <button type="button" class="btn" onclick="inserirAtalhoModelo('[linha:220]')">+ [linha:220]</button>
+                <button type="button" class="btn" onclick="inserirAtalhoModelo('[x:Opção]')">+ [x:Opção]</button>
+              </div>
+            </div>
+
+            <div id="fb-lista-itens" style="display:grid;gap:6px"></div>
+          </div>
+        </div>
       </div>
     </article>
   </main>
 
   <aside class="rail" aria-label="Ficha e ferramentas">
     <div id="rail-art" class="hidden">
-      <div class="box"><h3>Ficha da natureza</h3><div class="in">
-        <div class="row"><span>Código</span><b id="f-cod"></b></div>
-        <div class="row"><span>Artigo</span><span id="f-art"></span></div>
-        <div class="row"><span>Vinculadas</span><span id="f-vinc"></span></div>
+      <div class="box"><h3 id="ficha-titulo">Ficha da natureza</h3><div class="in">
+        <div class="row" id="row-cod"><span>Código</span><b id="f-cod"></b></div>
+        <div class="row" id="row-cat"><span>Categoria</span><span id="f-cat"></span></div>
+        <div class="row" id="row-art"><span>Artigo</span><span id="f-art"></span></div>
+        <div class="row" id="row-vinc"><span>Vinculadas</span><span id="f-vinc"></span></div>
+        <div class="row"><span>Criado por</span><span id="f-autor">—</span></div>
+        <div class="row"><span>Editado por</span><span id="f-editor">—</span></div>
         <div class="row"><span>Atualizado</span><span id="f-data"></span></div>
       </div></div>
       <div class="box" id="box-toc"><h3>Neste artigo</h3><div class="in"><div id="toc" class="toc"></div></div></div>
@@ -205,10 +445,10 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
         <div class="acts" id="acts-leitura">
           <button class="btn" id="btn-editar" onclick="ativarEdicao()"><i class="fa-solid fa-pen-to-square"></i> Editar conteúdo</button>
           <button class="btn" id="btn-vincular" onclick="abrirVinculos()"><i class="fa-solid fa-link"></i> Vincular naturezas</button>
-          <button class="btn danger" id="btn-excluir" onclick="excluirArtigo()"><i class="fa-solid fa-trash"></i> Excluir conteúdo</button>
+          <button class="btn danger" id="btn-excluir" onclick="excluirAtual()"><i class="fa-solid fa-trash"></i> Excluir conteúdo</button>
         </div>
         <div class="acts hidden" id="acts-edicao">
-          <button class="btn pri" id="btn-salvar" onclick="salvarArtigo()"><i class="fa-solid fa-floppy-disk"></i> Salvar alterações</button>
+          <button class="btn pri" id="btn-salvar" onclick="salvarAtual()"><i class="fa-solid fa-floppy-disk"></i> Salvar alterações</button>
           <button class="btn" onclick="cancelarEdicao()">Cancelar</button>
         </div>
       </div></div>
@@ -219,12 +459,37 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
 <div id="modal-acesso" class="modal hidden"><div>
   <div class="end" style="justify-content:space-between"><h3 id="acesso-titulo">Entrar na Wiki</h3><button class="btn" onclick="fecharAcesso()">✕</button></div>
   <div class="grp" style="width:100%"><button style="flex:1" onclick="abrirAcesso('login')">Entrar</button><button style="flex:1" onclick="abrirAcesso('cadastro')">Cadastrar (USER)</button></div>
-  <p class="muted" style="padding:0">Novos cadastros recebem o papel <b>USER</b> (somente leitura) até o Administrador liberar a edição.</p>
+  <p class="muted" style="padding:0">Novos cadastros recebem o papel <b>USER</b>. Usuários com papel <b>USER</b> visualizam fichas enviadas a eles, preenchem campos permitidos e podem <b>contestar o resultado da qualidade</b>.</p>
   <form id="form-acesso" style="display:grid;gap:10px">
     <input type="email" id="a-email" placeholder="E-mail" required>
     <input type="password" id="a-senha" placeholder="Senha (mín. 6)" required minlength="6">
     <p id="msg"></p>
     <button type="submit" class="btn pri" id="a-ok" style="padding:10px">Entrar</button>
+  </form>
+</div></div>
+
+<div id="modal-topico" class="modal hidden"><div>
+  <div class="end" style="justify-content:space-between"><h3><i class="fa-solid fa-file-circle-plus"></i> Novo artigo / tópico COPOM</h3><button class="btn" onclick="fecharNovoTopico()">✕</button></div>
+  <p class="muted" style="padding:0">Crie tópicos específicos do COPOM ou formulários de qualidade.</p>
+  <form id="form-topico" style="display:grid;gap:10px">
+    <label class="field">Título do tópico *
+      <input type="text" id="t-titulo" placeholder="Ex.: Manual e Fichas de Qualidade 190 (Pág. 4 a 6)" required maxlength="140">
+    </label>
+    <label class="field">Categoria
+      <select id="t-cat">
+        <option value="Instalações e Convivência">Instalações e Convivência</option>
+        <option value="Uniforme e Apresentação">Uniforme e Apresentação</option>
+        <option value="Rotina Operacional">Rotina Operacional</option>
+        <option value="Formulários e Fichas">Formulários e Fichas</option>
+        <option value="Normas e Avisos">Normas e Avisos</option>
+        <option value="Geral">Geral</option>
+      </select>
+    </label>
+    <p id="t-msg"></p>
+    <div class="end">
+      <button type="button" class="btn" onclick="fecharNovoTopico()">Cancelar</button>
+      <button type="submit" class="btn pri" id="t-ok">Criar e escrever</button>
+    </div>
   </form>
 </div></div>
 
@@ -244,11 +509,54 @@ const BUCKET='midias';
 const sb=supabase.createClient(SB_URL,SB_KEY);
 const $=id=>document.getElementById(id);
 const norm=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
-let N=[],A=[],cur=null,quill=null,user=null,role=null,modo='login',sel=new Set(),size=17;
-const podeEditar=()=>role==='editor'||role==='admin';
-const podeExcluir=()=>role==='admin';
 
-/* ===== Tema e fonte (um único listener cada — antes havia dois, e o clique alternava duas vezes) ===== */
+const CARGOS_GESTAO_TOTAL=['supervisor','coordenador','gerente','admin'];
+const CARGOS_QUALIDADE_E_ACIMA=['qualidade','supervisor','coordenador','gerente','admin'];
+const CARGOS_ARTIGO_NATUREZA=['editor','qualidade','supervisor','coordenador','gerente','admin'];
+const CARGOS_TOPICO_COPOM=['editor','supervisor','coordenador','gerente','admin'];
+
+let N=[],A=[],T=[],FICHAS=[];
+let cur=null,quill=null,user=null,role=null,modo='login',sel=new Set(),size=17;
+let formIniciado=false,fichaAtivaId=null,respostasRascunho={};
+let rascunhoForm={
+  subtitulo:'Sistema Integrado de Qualidade e Eficiência Operacional • Manual Normativo 190 (TQM / ISO 9000)',
+  headerCor:'#1e3a5f',
+  accentCor:'#1e3a5f',
+  bgCor:'#ffffff',
+  formato:'padrao',
+  itens:[]
+};
+
+const ehGestaoTotal=()=>CARGOS_GESTAO_TOTAL.includes(role);
+const ehQualidadeOuGestao=()=>CARGOS_QUALIDADE_E_ACIMA.includes(role);
+const podeGerirFormularios=()=>role==='editor'||ehQualidadeOuGestao();
+
+function podeEditarAtual(){
+  if(!cur||!role)return false;
+  if(cur.kind==='natureza')return CARGOS_ARTIGO_NATUREZA.includes(role);
+  if(cur.kind==='topico')return CARGOS_TOPICO_COPOM.includes(role);
+  return false;
+}
+function podeCriarTopico(){
+  return !!role&&CARGOS_TOPICO_COPOM.includes(role);
+}
+function podeExcluir(){
+  return !!role&&ehGestaoTotal();
+}
+
+function rotuloCargo(r){
+  const mapa={
+    admin:'Admin',
+    gerente:'Gerente',
+    coordenador:'Coordenador',
+    supervisor:'Supervisor',
+    qualidade:'Qualidade',
+    editor:'Editor',
+    user:'Usuário'
+  };
+  return mapa[r]||(r?r.toUpperCase():'Usuário');
+}
+
 function setTema(dark){
   document.documentElement.dataset.theme=dark?'dark':'light';
   $('tema').innerHTML=dark?'<i class="fa-solid fa-sun"></i>':'<i class="fa-solid fa-moon"></i>';
@@ -267,31 +575,51 @@ $('mais').addEventListener('click',()=>fonte(1));
 try{setTema(localStorage.getItem('copom_wiki_theme')==='dark')}catch(_){setTema(false)}
 fonte(0);
 
-/* ===== Permissões ===== */
 function uiPermissoes(){
   const logado=user&&role;
-  const nome=role==='admin'?'Admin (edita e exclui)':role==='editor'?'Editor (edita)':'User (leitura)';
-  $('badge').innerHTML=logado?`<i class="fa-solid fa-user-check"></i> ${user.email} · <b>${nome}</b>`:'<i class="fa-solid fa-eye"></i> Leitura (sem login)';
+  const nomePapel=rotuloCargo(role);
+  $('badge').innerHTML=logado
+    ?`<i class="fa-solid fa-user-check"></i> ${escapeHtml(user.email)} · <b>${escapeHtml(nomePapel)}</b>`
+    :'<i class="fa-solid fa-eye"></i> Desconectado';
   $('btn-entrar').classList.toggle('hidden',!!logado);
   $('btn-sair').classList.toggle('hidden',!logado);
-  $('btn-editar').disabled=!podeEditar();
-  $('btn-vincular').disabled=!podeEditar();
-  $('btn-excluir').disabled=!podeExcluir();
-  $('btn-editar').title=podeEditar()?'':'Requer permissão Editor ou Admin';
-  $('btn-excluir').title=podeExcluir()?'':'Requer permissão Admin';
-  if(!podeEditar()&&!$('edicao').classList.contains('hidden'))cancelarEdicao();
+
+  const okTopico=podeCriarTopico();
+  const okEditar=podeEditarAtual();
+  const okVincular=okEditar&&cur?.kind==='natureza';
+  const okExcluir=podeExcluir();
+
+  $('btn-novo-topico').disabled=!okTopico;
+  $('btn-editar').disabled=!okEditar;
+  $('btn-vincular').disabled=!okVincular;
+  $('btn-excluir').disabled=!okExcluir;
+
+  $('btn-novo-topico').title=okTopico?'':'Cargo atual não cria tópicos COPOM (exige Editor, Supervisor, Coordenador, Gerente ou Admin)';
+  $('btn-editar').title=okEditar?'':'Sem permissão para editar este item com o cargo atual';
+  $('btn-vincular').title=okVincular?'':'Apenas cargos de edição/qualidade/gestão podem vincular naturezas';
+  $('btn-excluir').title=okExcluir?'':'Apenas Supervisor, Coordenador, Gerente ou Admin podem excluir';
+
+  if(!okEditar&&!$('edicao').classList.contains('hidden'))cancelarEdicao();
 }
+
 async function carregarPapel(u){
   user=u||null;role=null;
   if(user){
     try{
       const{data,error}=await sb.from('PERFIS_ACESSO').select('papel').eq('id',user.id).maybeSingle();
       if(error)console.warn(error.message);
-      role=data?.papel||'user';
+      role=norm(data?.papel)||'user';
     }catch(e){role='user'}
   }
   uiPermissoes();
+  if(user)await carregarFichasPreenchidas();
+  else FICHAS=[];
+  if(cur){
+    if(cur.kind==='natureza')selecionarNatureza(cur.id,false);
+    else if(cur.kind==='topico')selecionarTopico(cur.id,false);
+  }
 }
+
 function abrirAcesso(aba){
   modo=aba;
   $('acesso-titulo').textContent=aba==='login'?'Entrar na Wiki':'Criar conta (USER)';
@@ -300,7 +628,11 @@ function abrirAcesso(aba){
   $('modal-acesso').classList.remove('hidden');
 }
 function fecharAcesso(){$('modal-acesso').classList.add('hidden')}
-async function sair(){await sb.auth.signOut();await carregarPapel(null)}
+async function sair(){
+  formIniciado=false;fichaAtivaId=null;
+  await sb.auth.signOut();
+  await carregarPapel(null);
+}
 $('form-acesso').addEventListener('submit',async e=>{
   e.preventDefault();
   const email=$('a-email').value.trim(),password=$('a-senha').value;
@@ -315,34 +647,102 @@ $('form-acesso').addEventListener('submit',async e=>{
       if(error)throw error;
       if(data.session?.user){
         await carregarPapel(data.session.user);fecharAcesso();
-        alert('Conta criada. Você só terá acesso a edições depois que o Administrador liberar.');
-      }else $('msg').textContent='Cadastro enviado! Confirme seu e-mail antes de entrar, se a confirmação estiver ativa.';
+        alert('Conta criada com perfil USER.');
+      }else $('msg').textContent='Cadastro enviado! Confirme seu e-mail antes de entrar, se necessário.';
     }
   }catch(err){$('msg').textContent=err.message||'Falha na autenticação.'}
   finally{$('a-ok').disabled=false}
 });
 
-/* ===== Dados ===== */
 function conteudoVazio(html){
   if(!html)return true;
   const d=new DOMParser().parseFromString(html,'text/html');
   return !d.body.textContent.replace(/[\s\u200b\u00a0]/g,'')&&!d.querySelector('img[src],iframe[src],video[src]');
 }
+function textoLimpo(html){
+  if(!html)return '';
+  const d=new DOMParser().parseFromString(html,'text/html');
+  return (d.body.textContent||'').replace(/[\s\u200b\u00a0]+/g,' ').trim();
+}
+function trechoBusca(texto,termo){
+  if(!texto||!termo)return '';
+  const nTexto=norm(texto);
+  const idx=nTexto.indexOf(termo);
+  if(idx===-1)return '';
+  const start=Math.max(0,idx-45);
+  const end=Math.min(texto.length,idx+termo.length+65);
+  return (start>0?'…':'')+texto.slice(start,end).trim()+(end<texto.length?'…':'');
+}
+function extrairNumeroPontos(val){
+  if(typeof val==='number')return isFinite(val)?val:0;
+  const m=String(val||'').replace(',','.').match(/-?\d+(\.\d+)?/);
+  return m?parseFloat(m[0]):0;
+}
+function normalizarFormConfig(raw){
+  const cfg=(raw&&typeof raw==='object')?raw:{};
+  return {
+    subtitulo:cfg.subtitulo||'Gestão da Qualidade e Acompanhamento • COPOM',
+    headerCor:cfg.headerCor||'#1e3a5f',
+    accentCor:cfg.accentCor||'#1e3a5f',
+    bgCor:cfg.bgCor||'#ffffff',
+    formato:cfg.formato||'padrao',
+    itens:Array.isArray(cfg.itens)?cfg.itens.map(x=>({
+      ...x,
+      quemPreenche:x.quemPreenche==='usuario'?'usuario':'qualidade',
+      checkEsq:!!x.checkEsq,
+      pontos:x.pontos!==undefined&&x.pontos!==null?String(x.pontos):'',
+      detalhe:x.detalhe||''
+    })):[]
+  };
+}
+function temAlgumConteudo(registro){
+  if(!registro)return false;
+  if(!conteudoVazio(registro.conteudo))return true;
+  if(registro.eh_formulario){
+    const cfg=normalizarFormConfig(registro.form_config);
+    return cfg.itens.length>0;
+  }
+  return false;
+}
+
 const artigoDe=n=>n&&n.artigo_id?A.find(a=>a.id===n.artigo_id):null;
-const temConteudo=n=>{const a=artigoDe(n);return !!a&&!conteudoVazio(a.conteudo)};
+const temConteudo=n=>temAlgumConteudo(artigoDe(n));
+const topicoTemConteudo=t=>temAlgumConteudo(t);
+
+async function carregarFichasPreenchidas(){
+  if(!user){FICHAS=[];return}
+  try{
+    const{data,error}=await sb.from('FICHAS_PREENCHIDAS').select('*').order('updated_at',{ascending:false});
+    if(error){console.warn('FICHAS_PREENCHIDAS:',error.message);FICHAS=[];return}
+    FICHAS=data||[];
+  }catch(e){console.warn(e);FICHAS=[]}
+}
 
 async function carregarDados(){
   try{
-    const[rn,ra]=await Promise.all([sb.from('NATUREZAS').select('*').order('id',{ascending:true}),sb.from('ARTIGOS').select('*')]);
-    if(rn.error)throw rn.error;if(ra.error)throw ra.error;
-    N=rn.data||[];A=ra.data||[];
+    const[rn,ra,rt]=await Promise.all([
+      sb.from('NATUREZAS').select('*').order('id',{ascending:true}),
+      sb.from('ARTIGOS').select('*'),
+      sb.from('TOPICOS_COPOM').select('*').order('id',{ascending:true})
+    ]);
+    if(rn.error)throw rn.error;
+    if(ra.error)throw ra.error;
+    if(rt.error)console.warn('TOPICOS_COPOM:',rt.error.message);
+    N=rn.data||[];
+    A=ra.data||[];
+    T=rt.error?[]:(rt.data||[]);
+    if(user)await carregarFichasPreenchidas();
     $('status').innerHTML='<i class="fa-solid fa-circle" style="color:#16a34a;font-size:8px"></i> Base disponível';
     atualizarSidebar();
-    if(cur)selecionar(cur,false);
+    if(cur){
+      if(cur.kind==='natureza')selecionarNatureza(cur.id,false);
+      else if(cur.kind==='topico')selecionarTopico(cur.id,false);
+    }
     if($('busca').value.trim())pesquisar($('busca').value);
   }catch(err){
     console.error(err);
     $('contador').textContent='Não foi possível carregar os dados.';
+    $('contador-topicos').textContent='Não foi possível carregar os tópicos.';
     $('lista').innerHTML='<button class="nav" onclick="carregarDados()">Tentar novamente</button>';
     $('status').innerHTML='<i class="fa-solid fa-triangle-exclamation" style="color:#dc2626"></i> Base indisponível';
   }
@@ -353,55 +753,173 @@ function renderLista(itens,el,vazio){
   if(!itens.length){const p=document.createElement('p');p.className='muted';p.textContent=vazio;el.append(p);return}
   itens.forEach(n=>{
     const b=document.createElement('button');b.type='button';b.className='nav';
-    if(cur===n.id)b.setAttribute('aria-current','page');
+    if(cur?.kind==='natureza'&&cur.id===n.id)b.setAttribute('aria-current','page');
     const c=document.createElement('span');c.className='c';c.textContent=n.id;
     const t=document.createElement('span');t.textContent=n.natureza;
-    b.append(c,t);b.onclick=()=>{selecionar(n.id);fecharBusca()};el.append(b);
+    b.append(c,t);b.onclick=()=>{selecionarNatureza(n.id);fecharBusca()};el.append(b);
   });
 }
+
+function renderListaTopicos(){
+  const box=$('lista-topicos');
+  box.replaceChildren();
+  $('contador-topicos').textContent=`${T.length} ${T.length===1?'tópico cadastrado':'tópicos cadastrados'}`;
+  if(!T.length){
+    const p=document.createElement('p');p.className='muted';p.textContent='Nenhum tópico avulso criado ainda.';
+    box.append(p);return;
+  }
+  T.forEach(t=>{
+    const b=document.createElement('button');b.type='button';b.className='nav';
+    if(cur?.kind==='topico'&&cur.id===t.id)b.setAttribute('aria-current','page');
+    const c=document.createElement('span');c.className='c';
+    c.innerHTML=t.eh_formulario?'<i class="fa-solid fa-clipboard-list"></i>':'<i class="fa-solid fa-file-lines"></i>';
+    const s=document.createElement('span');s.textContent=t.titulo;
+    b.append(c,s);
+    b.onclick=()=>{selecionarTopico(t.id);fecharBusca()};
+    box.append(b);
+  });
+}
+
 function atualizarSidebar(){
+  renderListaTopicos();
   const com=N.filter(temConteudo);
   $('contador').textContent=`${com.length} ocorrências com conteúdo`;
   renderLista(com.slice(0,40),$('lista'),'Ainda não há artigos com conteúdo.');
   renderRecentes();
 }
-function resumoCurto(html){
-  const d=new DOMParser().parseFromString(html||'','text/html');
+
+function resumoCurto(reg){
+  if(!reg)return 'Sem texto cadastrado.';
+  if(reg.eh_formulario){
+    const cfg=normalizarFormConfig(reg.form_config);
+    return `Formulário de Qualidade (${cfg.itens.length} ${cfg.itens.length===1?'item':'itens'}) · ${cfg.subtitulo}`;
+  }
+  const d=new DOMParser().parseFromString(reg.conteudo||'','text/html');
   const t=(d.body.textContent||'').replace(/\s+/g,' ').trim();
   if(!t)return d.querySelector('img,iframe,video')?'Contém mídia/anexo.':'Sem texto cadastrado.';
   return t.length>140?t.slice(0,140)+'…':t;
 }
 const dataCurta=iso=>{const d=new Date(iso);return iso&&!isNaN(d)?d.toLocaleDateString('pt-BR'):''};
+
 function renderRecentes(){
   const ul=$('recentes');ul.replaceChildren();
-  const arts=A.filter(a=>!conteudoVazio(a.conteudo)).sort((a,b)=>{
-    const ta=new Date(a.updated_at||a.created_at||0),tb=new Date(b.updated_at||b.created_at||0);
-    return tb-ta||(b.id-a.id);
-  }).slice(0,9);
-  if(!arts.length){ul.innerHTML='<li class="muted">Nenhum complemento publicado até o momento.</li>';return}
-  arts.forEach(a=>{
+  const itens=[];
+
+  T.filter(topicoTemConteudo).forEach(t=>{
+    const autorTxt=t.editado_por||t.autor_email||'';
+    itens.push({
+      dataRef:new Date(t.updated_at||t.created_at||0),
+      idSort:t.id,
+      titulo:`${t.eh_formulario?'FORMULÁRIO':'COPOM'} · ${t.titulo}`,
+      resumo:resumoCurto(t),
+      meta:[dataCurta(t.updated_at||t.created_at)?'Atualizado em '+dataCurta(t.updated_at||t.created_at):'',autorTxt?'Por '+autorTxt:''].filter(Boolean).join(' · '),
+      onClick:()=>selecionarTopico(t.id)
+    });
+  });
+
+  A.filter(temAlgumConteudo).forEach(a=>{
     const n=N.find(x=>x.artigo_id===a.id);
+    const autorTxt=a.editado_por||a.autor_email||'';
+    itens.push({
+      dataRef:new Date(a.updated_at||a.created_at||0),
+      idSort:a.id,
+      titulo:n?`${n.id} · ${n.natureza}`:(a.titulo||`Artigo #${a.id}`),
+      resumo:resumoCurto(a),
+      meta:[dataCurta(a.updated_at||a.created_at)?'Atualizado em '+dataCurta(a.updated_at||a.created_at):'',autorTxt?'Por '+autorTxt:''].filter(Boolean).join(' · '),
+      onClick:n?()=>selecionarNatureza(n.id):null
+    });
+  });
+
+  itens.sort((a,b)=>(b.dataRef-a.dataRef)||(b.idSort-a.idSort));
+  const top=itens.slice(0,9);
+  if(!top.length){ul.innerHTML='<li class="muted">Nenhum complemento ou tópico publicado até o momento.</li>';return}
+
+  top.forEach(item=>{
     const li=document.createElement('li'),b=document.createElement('button');
     b.type='button';
-    const t=document.createElement('b');t.textContent=n?`${n.id} · ${n.natureza}`:(a.titulo||`Artigo #${a.id}`);
-    const s=document.createElement('span');s.textContent=resumoCurto(a.conteudo);
+    const t=document.createElement('b');t.textContent=item.titulo;
+    const s=document.createElement('span');s.textContent=item.resumo;
     b.append(t,s);
-    const d=dataCurta(a.updated_at||a.created_at);
-    if(d){const m=document.createElement('small');m.textContent='Atualizado em '+d;b.append(m)}
-    if(n)b.onclick=()=>selecionar(n.id);
+    if(item.meta){const m=document.createElement('small');m.textContent=item.meta;b.append(m)}
+    if(item.onClick)b.onclick=item.onClick;
     li.append(b);ul.append(li);
   });
 }
 
-/* ===== Busca ===== */
 function fecharBusca(){$('res').classList.add('hidden')}
+
+function buscarResultados(raw){
+  const termo=norm(raw);
+  if(!termo)return [];
+  const termos=termo.split(/\s+/).filter(Boolean);
+  const resultados=[];
+
+  T.forEach(t=>{
+    const titulo=t.titulo||'';
+    const cat=t.categoria||'';
+    const texto=textoLimpo(t.conteudo);
+    const cfg=normalizarFormConfig(t.form_config);
+    const formTexto=t.eh_formulario?cfg.itens.map(i=>`${i.secao||''} ${i.rotulo||''} ${i.detalhe||''} ${(i.opcoes||[]).join(' ')} ${(i.colunas||[]).join(' ')}`).join(' '):'';
+    const base=`${titulo} ${cat} ${texto} ${formTexto}`;
+    if(termos.every(k=>norm(base).includes(k))){
+      resultados.push({
+        badge:t.eh_formulario?'Formulário':'Tópico COPOM',
+        title:titulo,
+        snippet:trechoBusca(`${texto} ${formTexto}`,termos[0])||cat,
+        onClick:()=>{selecionarTopico(t.id);fecharBusca()}
+      });
+    }
+  });
+
+  N.forEach(n=>{
+    const art=artigoDe(n);
+    const textoArt=art?textoLimpo(art.conteudo):'';
+    const tituloArt=art?.titulo||'';
+    const cfg=art?.eh_formulario?normalizarFormConfig(art.form_config):null;
+    const formTexto=cfg?cfg.itens.map(i=>`${i.secao||''} ${i.rotulo||''} ${i.detalhe||''} ${(i.opcoes||[]).join(' ')}`).join(' '):'';
+    const combinado=norm(`${n.id||''} ${n.natureza||''} ${tituloArt} ${textoArt} ${formTexto}`);
+
+    if(termos.every(k=>combinado.includes(k))){
+      const nArt=norm(`${tituloArt} ${textoArt} ${formTexto}`);
+      const matchNoTexto=termos.some(k=>nArt.includes(k));
+      const snip=matchNoTexto?trechoBusca(`${textoArt} ${formTexto}`,termos.find(k=>nArt.includes(k))||termos[0]):'';
+      resultados.push({
+        badge:art?.eh_formulario?'Formulário':(matchNoTexto?'No artigo':'Natureza'),
+        title:`${n.id} · ${n.natureza}`,
+        snippet:snip,
+        onClick:()=>{selecionarNatureza(n.id);fecharBusca()}
+      });
+    }
+  });
+
+  return resultados.slice(0,50);
+}
+
 function pesquisar(v){
   const t=norm(v);
   if(!t)return fecharBusca();
-  const itens=N.filter(n=>String(n.id).includes(t)||norm(n.natureza).includes(t)).slice(0,60);
-  renderLista(itens,$('res'),'Nenhuma natureza encontrada.');
-  $('res').classList.remove('hidden');
+  const itens=buscarResultados(v);
+  const box=$('res');
+  box.replaceChildren();
+  if(!itens.length){
+    const p=document.createElement('p');p.className='muted';
+    p.textContent='Nenhuma natureza, tópico ou formulário encontrado para esse termo.';
+    box.append(p);
+  }else{
+    itens.forEach(item=>{
+      const b=document.createElement('button');b.type='button';b.className='res-item';
+      const top=document.createElement('div');top.className='res-top';
+      const badge=document.createElement('span');badge.className='res-badge';badge.textContent=item.badge;
+      const title=document.createElement('span');title.className='res-title';title.textContent=item.title;
+      top.append(badge,title);b.append(top);
+      if(item.snippet){const sn=document.createElement('span');sn.className='res-snip';sn.textContent=item.snippet;b.append(sn)}
+      b.onclick=item.onClick;
+      box.append(b);
+    });
+  }
+  box.classList.remove('hidden');
 }
+
 $('busca').addEventListener('input',e=>pesquisar(e.target.value));
 $('busca').addEventListener('keydown',e=>{
   if(e.key==='Escape')fecharBusca();
@@ -410,12 +928,12 @@ $('busca').addEventListener('keydown',e=>{
 $('form-busca').addEventListener('submit',e=>{e.preventDefault();pesquisar($('busca').value)});
 document.addEventListener('click',e=>{if(!e.target.closest('.search'))fecharBusca()});
 
-/* ===== Navegação / artigo ===== */
 function voltarInicio(){
-  cancelarEdicao();cur=null;
+  cancelarEdicao();cur=null;formIniciado=false;fichaAtivaId=null;
   $('artigo').classList.add('hidden');$('rail-art').classList.add('hidden');$('home').classList.remove('hidden');
   $('busca').value='';fecharBusca();atualizarSidebar();window.scrollTo(0,0);
 }
+
 function montarToc(){
   const toc=$('toc');toc.replaceChildren();
   const hs=$('corpo').querySelectorAll('h1,h2,h3');let n=0;
@@ -429,30 +947,1100 @@ function montarToc(){
   });
   $('box-toc').classList.toggle('hidden',!n);
 }
-function selecionar(id,limpar=true){
+
+function fichasRelacionadas(){
+  if(!cur)return [];
+  return FICHAS.filter(f=>f.origem_kind===cur.kind&&Number(f.origem_id)===Number(cur.id));
+}
+
+function renderizarVisualizacao(tituloStr,registro){
+  const corpo=$('corpo');
+  const startBox=$('form-start-screen');
+  const runner=$('form-runner');
+
+  if(registro?.eh_formulario){
+    const cfg=normalizarFormConfig(registro.form_config);
+    corpo.classList.add('hidden');
+
+    if(!user){
+      runner.classList.add('hidden');
+      startBox.classList.remove('hidden');
+      startBox.innerHTML=`
+        <span class="res-badge" style="width:max-content">Acesso restrito a usuários conectados</span>
+        <h2>${escapeHtml(tituloStr)}</h2>
+        <p class="muted" style="padding:0">Para visualizar ou acessar fichas deste formulário, faça login com sua conta no sistema.</p>
+        <div>
+          <button type="button" class="btn pri" onclick="abrirAcesso('login')"><i class="fa-solid fa-right-to-bracket"></i> Entrar para acessar</button>
+        </div>
+      `;
+      return;
+    }
+
+    if(!formIniciado){
+      runner.classList.add('hidden');
+      startBox.classList.remove('hidden');
+
+      const rel=fichasRelacionadas();
+      const isGestor=podeGerirFormularios();
+      const visiveisUser=rel.filter(f=>
+        (f.status==='enviada'||f.status==='finalizada'||f.status==='contestada')
+        && (norm(f.usuario_email)===norm(user.email)||f.usuario_id===user.id)
+      );
+      const listaExibir=isGestor?rel:visiveisUser;
+
+      let botoesTopo='';
+      if(isGestor){
+        botoesTopo=`
+          <button type="button" class="btn pri" style="padding:9px 16px;font-size:13.5px" onclick="iniciarNovaFichaEditor()">
+            <i class="fa-solid fa-play"></i> Iniciar formulário (${escapeHtml(rotuloCargo(role))})
+          </button>
+        `;
+      }else{
+        botoesTopo=`
+          <span class="muted" style="padding:0">Abra uma ficha enviada para você para preencher seus campos ou <b>contestar o resultado da qualidade</b>.</span>
+        `;
+      }
+
+      let listaHtml='';
+      if(listaExibir.length){
+        listaHtml=`<div class="ficha-lista"><b>${isGestor?'Fichas de todos os usuários':'Suas fichas enviadas'} (${listaExibir.length})</b>`;
+        listaExibir.forEach(fc=>{
+          const stClass=fc.status==='finalizada'?'finalizada':(fc.status==='enviada'?'enviada':(fc.status==='contestada'?'contestada':''));
+          const stLabel=fc.status==='finalizada'?'Finalizada':(fc.status==='enviada'?'Enviada ao usuário':(fc.status==='contestada'?'Contestada pelo usuário':'Rascunho'));
+          const notaExibida=(fc.respostas&&fc.respostas._notaFinal!==undefined&&fc.respostas._notaFinal!==null&&fc.respostas._notaFinal!=='')
+            ?` · Nota: <b>${escapeHtml(String(fc.respostas._notaFinal))} / 100</b>`:'';
+          const contestResumo=(fc.respostas&&fc.respostas._contestacao)
+            ?`<div class="muted" style="padding:2px 0 0;color:#b45309"><i class="fa-solid fa-scale-balanced"></i> Contestação: ${escapeHtml(fc.respostas._contestacao)}</div>`:'';
+          listaHtml+=`
+            <div class="ficha-card">
+              <div>
+                <b>Usuário:</b> ${escapeHtml(fc.usuario_email||'—')} ·
+                <span class="status-pill ${stClass}">${stLabel}</span>${notaExibida}
+                <div class="muted" style="padding:2px 0 0">Avaliador: ${escapeHtml(fc.avaliador_email||'—')} · Atualizado: ${escapeHtml(dataCurta(fc.updated_at||fc.created_at)||'—')}</div>
+                ${contestResumo}
+              </div>
+              <button type="button" class="btn" onclick="abrirFichaExistente(${fc.id})"><i class="fa-solid fa-folder-open"></i> Abrir ficha</button>
+            </div>
+          `;
+        });
+        listaHtml+='</div>';
+      }else{
+        listaHtml=`<p class="muted" style="padding:0">${isGestor?'Nenhuma ficha registrada ainda para este formulário.':'Nenhuma ficha foi enviada para o seu cadastro neste formulário até o momento.'}</p>`;
+      }
+
+      startBox.innerHTML=`
+        <span class="res-badge" style="width:max-content">Formulário de Qualidade</span>
+        <h2>${escapeHtml(tituloStr)}</h2>
+        <p class="muted" style="padding:0">${escapeHtml(cfg.subtitulo)}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">${botoesTopo}</div>
+        ${listaHtml}
+      `;
+    }else{
+      startBox.classList.add('hidden');
+      runner.classList.remove('hidden');
+      montarFormularioInterativo(tituloStr,cfg,registro.conteudo||'');
+    }
+  }else{
+    startBox.classList.add('hidden');
+    runner.classList.add('hidden');
+    corpo.classList.remove('hidden');
+    if(registro&&!conteudoVazio(registro.conteudo))corpo.innerHTML=registro.conteudo;
+    else corpo.innerHTML='<p class="empty">Nenhuma orientação cadastrada até o momento.</p>';
+  }
+}
+
+function iniciarNovaFichaEditor(){
+  if(!podeGerirFormularios())return alert('Apenas Editor, Qualidade, Supervisor, Coordenador, Gerente ou Admin pode iniciar formulários.');
+  fichaAtivaId=null;
+  respostasRascunho={_destinatarioEmail:'',_status:'rascunho',_contestacao:'',_notaFinal:'',_notaManual:false};
+  formIniciado=true;
+  reabrirAtualSemLimpar();
+}
+
+function abrirFichaExistente(id){
+  const fc=FICHAS.find(x=>x.id===id);
+  if(!fc)return;
+  if(!user)return alert('Faça login para visualizar a ficha.');
+  const souDono=(norm(fc.usuario_email)===norm(user.email))||(fc.usuario_id===user.id);
+  if(!podeGerirFormularios()&&(!souDono||fc.status==='rascunho')){
+    return alert('Acesso negado: esta ficha ainda não foi enviada para você.');
+  }
+  fichaAtivaId=fc.id;
+  respostasRascunho={
+    ...(fc.respostas||{}),
+    _destinatarioEmail:fc.usuario_email||'',
+    _status:fc.status||'enviada',
+    _contestacao:(fc.respostas&&fc.respostas._contestacao)||'',
+    _notaFinal:(fc.respostas&&fc.respostas._notaFinal!==undefined)?fc.respostas._notaFinal:'',
+    _notaManual:!!(fc.respostas&&fc.respostas._notaManual)
+  };
+  formIniciado=true;
+  reabrirAtualSemLimpar();
+}
+
+function reabrirAtualSemLimpar(){
+  if(!cur)return;
+  if(cur.kind==='natureza')selecionarNatureza(cur.id,false);
+  else selecionarTopico(cur.id,false);
+}
+
+function renderizarFluxoMisto(template,chaveBase,salvoObj,habilitado){
+  const container=document.createElement('div');
+  container.className='inline-flow';
+  container.dataset.qKey=chaveBase;
+  container.dataset.qTipo='linha_mista';
+
+  const dados=(salvoObj&&typeof salvoObj==='object')?salvoObj:{inputs:{},checks:{}};
+  const inputsSalvos=dados.inputs||{};
+  const checksSalvos=dados.checks||{};
+
+  const regex=/(\[(?:campo|linha)(?::(\d+))?\]|\[x:([^\]]+)\]|_{3,})/gi;
+  let lastIndex=0;
+  let match;
+  let inpIdx=0;
+  let chkIdx=0;
+
+  while((match=regex.exec(template))!==null){
+    if(match.index>lastIndex){
+      const txtAntes=template.slice(lastIndex,match.index);
+      const span=document.createElement('span');
+      if(lastIndex===0&&txtAntes.includes(':')){
+        const p=txtAntes.indexOf(':');
+        span.innerHTML=`<b>${escapeHtml(txtAntes.slice(0,p+1))}</b>${escapeHtml(txtAntes.slice(p+1))}`;
+      }else{
+        span.textContent=txtAntes;
+      }
+      container.append(span);
+    }
+
+    const token=match[0];
+    if(token.toLowerCase().startsWith('[x:')){
+      const labelOp=match[3].trim();
+      const keyC=`c_${chkIdx++}`;
+      const choice=document.createElement('label');
+      choice.className='x-choice'+(!habilitado?' disabled':'');
+      const inp=document.createElement('input');
+      inp.type='checkbox';
+      inp.dataset.subKey=keyC;
+      inp.checked=!!checksSalvos[keyC];
+      inp.disabled=!habilitado;
+      const box=document.createElement('span');
+      box.className='x-box';
+      box.textContent='X';
+      const txt=document.createElement('span');
+      txt.textContent=labelOp;
+      choice.append(inp,box,txt);
+      container.append(choice);
+    }else{
+      const ehLinha=token.toLowerCase().startsWith('[linha');
+      const keyI=`i_${inpIdx++}`;
+      const largura=match[2]?parseInt(match[2],10):(ehLinha?220:90);
+      const inp=document.createElement('input');
+      inp.type='text';
+      inp.className='inline-input'+(ehLinha?' dashed':(largura>=140?' wide':''));
+      inp.style.width=Math.max(36,largura)+'px';
+      inp.dataset.subKey=keyI;
+      inp.value=inputsSalvos[keyI]||'';
+      inp.disabled=!habilitado;
+      container.append(inp);
+    }
+
+    lastIndex=regex.lastIndex;
+  }
+
+  if(lastIndex<template.length){
+    const spanRest=document.createElement('span');
+    const rest=template.slice(lastIndex);
+    if(lastIndex===0&&rest.includes(':')){
+      const p=rest.indexOf(':');
+      spanRest.innerHTML=`<b>${escapeHtml(rest.slice(0,p+1))}</b>${escapeHtml(rest.slice(p+1))}`;
+    }else{
+      spanRest.textContent=rest;
+    }
+    container.append(spanRest);
+  }
+
+  return container;
+}
+
+function recalcularPontuacaoDinamica(forcarZero=false){
+  const runner=$('form-runner');
+  if(!runner)return;
+
+  const isGestor=podeGerirFormularios();
+  let somaObtida=0;
+  let somaAplicavel=0;
+  let temPenalidadeCritica=false;
+
+  runner.querySelectorAll('.align-box[data-q-key]').forEach(box=>{
+    const ptsItem=extrairNumeroPontos(box.dataset.ptsDinamico||'0');
+    const marcadas=[...box.querySelectorAll('input[type="radio"]:checked,input[type="checkbox"]:checked')].map(i=>norm(i.value));
+    const ehNA=marcadas.some(v=>v==='n/a'||v==='na'||v==='nao aplicavel');
+    const ehSim=marcadas.some(v=>v==='sim'||v.startsWith('sim '));
+
+    if(!ehNA&&ptsItem>0){
+      somaAplicavel+=ptsItem;
+      if(ehSim)somaObtida+=ptsItem;
+    }
+  });
+
+  runner.querySelectorAll('.form-opts[data-q-key]').forEach(box=>{
+    const tituloSec=norm(box.closest('.form-sec')?.querySelector('.form-sec-title')?.textContent||'');
+    if(tituloSec.includes('penalidades criticas')||tituloSec.includes('tolerancia zero')){
+      const marcados=[...box.querySelectorAll('input:checked')];
+      if(marcados.length>0)temPenalidadeCritica=true;
+    }
+  });
+
+  if(forcarZero)temPenalidadeCritica=true;
+
+  const notaCalc=temPenalidadeCritica
+    ?0
+    :(somaAplicavel>0?Math.round((somaObtida/somaAplicavel)*100):0);
+
+  const resumoBar=$('score-summary-bar');
+  const notaInp=$('fc-nota-final');
+  const infoPts=$('fc-pts-detalhe');
+
+  if(resumoBar){
+    resumoBar.classList.toggle('zero-alert',temPenalidadeCritica||Number(notaInp?.value)===0);
+  }
+  if(infoPts){
+    infoPts.textContent=`Critérios marcados "Sim": ${somaObtida} / ${somaAplicavel} pts aplicáveis`;
+  }
+
+  if(notaInp){
+    if(temPenalidadeCritica){
+      notaInp.value='0';
+      respostasRascunho._notaManual=false;
+    }else if(!respostasRascunho._notaManual||forcarZero){
+      notaInp.value=String(notaCalc);
+    }
+    respostasRascunho._notaFinal=notaInp.value;
+    if(isGestor)notaInp.disabled=false;
+  }
+
+  runner.querySelectorAll('.inline-flow[data-q-key]').forEach(box=>{
+    if((box.textContent||'').includes('Pontuação Final:')){
+      const firstInp=box.querySelector('input.inline-input');
+      if(firstInp&&notaInp)firstInp.value=notaInp.value;
+    }
+  });
+}
+
+function zerarNotaManualmente(){
+  respostasRascunho._notaManual=true;
+  respostasRascunho._notaFinal='0';
+  if($('fc-nota-final'))$('fc-nota-final').value='0';
+  recalcularPontuacaoDinamica(false);
+}
+
+function montarFormularioInterativo(tituloStr,cfg,htmlExtra){
+  const runner=$('form-runner');
+  runner.replaceChildren();
+
+  const isGestor=podeGerirFormularios();
+  const sheet=document.createElement('div');
+  sheet.className=`form-sheet formato-${cfg.formato||'padrao'}`;
+  sheet.style.setProperty('--f-header',cfg.headerCor||'#1e3a5f');
+  sheet.style.setProperty('--f-accent',cfg.accentCor||'#1e3a5f');
+  sheet.style.setProperty('--f-bg',cfg.bgCor||'#ffffff');
+
+  const banner=document.createElement('div');
+  banner.className='form-banner';
+  banner.innerHTML=`<h2>${escapeHtml(tituloStr)}</h2><p>${escapeHtml(cfg.subtitulo||'')}</p>`;
+  sheet.append(banner);
+
+  const assignBar=document.createElement('div');
+  assignBar.className='form-assign-bar';
+  const stAtual=respostasRascunho._status||'rascunho';
+  if(isGestor){
+    assignBar.innerHTML=`
+      <label><b>Usuário destinatário (e-mail):</b>
+        <input type="email" id="fc-dest-email" placeholder="usuario@empresa.com" value="${escapeHtml(respostasRascunho._destinatarioEmail||'')}">
+      </label>
+      <span><b>Status:</b> <span class="status-pill ${escapeHtml(stAtual)}" id="fc-status-label">${escapeHtml(stAtual.toUpperCase())}</span></span>
+    `;
+  }else{
+    assignBar.innerHTML=`
+      <span><b>Usuário avaliado:</b> ${escapeHtml(user?.email||'')}</span>
+      <span><b>Status da ficha:</b> <span class="status-pill ${escapeHtml(stAtual)}">${escapeHtml(stAtual)}</span></span>
+    `;
+  }
+  sheet.append(assignBar);
+
+  const scoreBar=document.createElement('div');
+  scoreBar.className='score-summary-bar';
+  scoreBar.id='score-summary-bar';
+  const notaInicial=(respostasRascunho._notaFinal!==undefined&&respostasRascunho._notaFinal!==null&&respostasRascunho._notaFinal!=='')
+    ?respostasRascunho._notaFinal:'0';
+  scoreBar.innerHTML=`
+    <div>
+      <b>Pontuação Final:</b>
+      <input type="number" min="0" max="100" step="1" class="score-num-input" id="fc-nota-final" value="${escapeHtml(String(notaInicial))}" ${isGestor?'':'disabled'}>
+      <b>/ 100 pts</b>
+      <span class="muted" id="fc-pts-detalhe" style="padding:0 0 0 8px"></span>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      ${isGestor?`
+        <button type="button" class="btn" onclick="respostasRascunho._notaManual=false;recalcularPontuacaoDinamica()">Recalcular</button>
+        <button type="button" class="btn danger" onclick="zerarNotaManualmente()">Nota 0 (Tolerância Zero)</button>
+      `:`
+        <button type="button" class="btn warn" onclick="focarContestacao()"><i class="fa-solid fa-scale-balanced"></i> Contestar resultado da qualidade</button>
+      `}
+    </div>
+  `;
+  sheet.append(scoreBar);
+
+  const celulasTopo=[];
+  const blocosAssinatura=[];
+  const secoesMap=new Map();
+
+  cfg.itens.forEach((it,idx)=>{
+    const itemComIdx={...it,_idx:idx};
+    if(it.tipo==='grade_topo'){
+      celulasTopo.push(itemComIdx);
+    }else if(it.tipo==='assinaturas'){
+      blocosAssinatura.push(itemComIdx);
+    }else{
+      const secName=it.secao||'1. Avaliação e Alinhamento';
+      if(!secoesMap.has(secName))secoesMap.set(secName,[]);
+      secoesMap.get(secName).push(itemComIdx);
+    }
+  });
+
+  if(celulasTopo.length){
+    const metaGrid=document.createElement('div');
+    metaGrid.className='form-meta-grid';
+    celulasTopo.forEach(item=>{
+      const campoDoUsuario=item.quemPreenche==='usuario';
+      const podePreencher=isGestor||campoDoUsuario;
+      const chave=`q_${item._idx}`;
+      const salvo=respostasRascunho[chave];
+
+      const cell=document.createElement('div');
+      cell.className='form-meta-cell';
+      const head=document.createElement('div');
+      head.className='form-meta-head';
+      head.innerHTML=`<span>${escapeHtml(item.rotulo||'Campo')}</span><span class="perm-tag ${campoDoUsuario?'user-ok':''}">${campoDoUsuario?'Usuário':'Gestão/Qualidade'}</span>`;
+      cell.append(head);
+
+      const temTokens=/(\[(?:campo|linha)|\[x:|_{3,})/i.test(item.rotulo||'');
+      if(temTokens){
+        head.remove();
+        const fluxo=renderizarFluxoMisto(item.rotulo||'',chave,salvo,podePreencher);
+        cell.append(fluxo);
+      }else{
+        const inp=document.createElement('input');
+        inp.type='text';
+        inp.className='form-line-input';
+        inp.dataset.qKey=chave;
+        inp.dataset.qTipo='campo';
+        inp.value=typeof salvo==='string'?salvo:'';
+        inp.disabled=!podePreencher;
+        cell.append(inp);
+      }
+      metaGrid.append(cell);
+    });
+    sheet.append(metaGrid);
+  }
+
+  secoesMap.forEach((listaItens,secNome)=>{
+    const sec=document.createElement('div');
+    sec.className='form-sec';
+    const secHead=document.createElement('div');
+    secHead.className='form-sec-title';
+    secHead.textContent=secNome;
+    sec.append(secHead);
+
+    listaItens.forEach(item=>{
+      const campoDoUsuario=item.quemPreenche==='usuario';
+      const podePreencherCampo=isGestor||campoDoUsuario;
+      const chave=`q_${item._idx}`;
+      const salvo=respostasRascunho[chave];
+
+      if(item.tipo==='tabela'){
+        const wrap=document.createElement('div');
+        wrap.className='form-table-wrap';
+        const cols=(item.colunas&&item.colunas.length)?item.colunas:['Data','Protocolo CAD','Duração','Nota Final','Principal Ponto Observado'];
+        const tbl=document.createElement('table');
+        tbl.className='form-table';
+        const thead=document.createElement('thead');
+        const trh=document.createElement('tr');
+        cols.forEach(c=>{const th=document.createElement('th');th.textContent=c;trh.append(th)});
+        thead.append(trh);
+        const tbody=document.createElement('tbody');
+        const rowsData=Array.isArray(salvo)&&salvo.length?salvo:Array.from({length:3},()=>cols.map(()=>''));
+
+        rowsData.forEach(rVals=>{
+          const tr=document.createElement('tr');
+          cols.forEach((_,ci)=>{
+            const td=document.createElement('td');
+            const inp=document.createElement('input');
+            inp.type='text';
+            inp.value=rVals[ci]||'';
+            inp.disabled=!podePreencherCampo;
+            td.append(inp);tr.append(td);
+          });
+          tbody.append(tr);
+        });
+        tbl.append(thead,tbody);
+
+        const addRowBtn=document.createElement('button');
+        addRowBtn.type='button';addRowBtn.className='btn';addRowBtn.style.marginTop='8px';
+        addRowBtn.disabled=!podePreencherCampo;
+        addRowBtn.innerHTML='<i class="fa-solid fa-plus"></i> Adicionar linha';
+        addRowBtn.onclick=()=>{
+          const tr=document.createElement('tr');
+          cols.forEach(()=>{
+            const td=document.createElement('td');
+            const inp=document.createElement('input');
+            inp.type='text';td.append(inp);tr.append(td);
+          });
+          tbody.append(tr);
+        };
+        wrap.dataset.qKey=chave;
+        wrap.dataset.qTipo='tabela';
+        wrap.append(tbl,addRowBtn);
+        sec.append(wrap);
+      }else{
+        const row=document.createElement('div');
+        row.className='form-q-row';
+
+        if(item.checkEsq){
+          const leadLbl=document.createElement('label');
+          leadLbl.className='form-lead-check';
+          const leadInp=document.createElement('input');
+          leadInp.type='checkbox';
+          leadInp.dataset.qLeadKey=chave;
+          leadInp.checked=!!(salvo&&typeof salvo==='object'&&salvo.leadChecked);
+          leadInp.disabled=!podePreencherCampo;
+          const leadBox=document.createElement('span');
+          leadBox.className='form-lead-box';
+          leadBox.textContent='X';
+          leadLbl.append(leadInp,leadBox);
+          row.append(leadLbl);
+        }
+
+        const body=document.createElement('div');
+        body.className='form-q-body';
+
+        const perm=document.createElement('span');
+        perm.className='perm-tag'+(campoDoUsuario?' user-ok':'');
+        perm.textContent=campoDoUsuario?'Usuário preenche':'Gestão / Qualidade';
+
+        if(item.tipo==='alinhamento'){
+          const dadosAl=(salvo&&typeof salvo==='object')?salvo:{marcadas:[],nota:''};
+          const ptsEfetivo=(dadosAl.ptsCustom!==undefined&&dadosAl.ptsCustom!==null&&dadosAl.ptsCustom!=='')
+            ?String(dadosAl.ptsCustom)
+            :(item.pontos||'10');
+
+          const box=document.createElement('div');
+          box.className='align-box';
+          box.dataset.qKey=chave;
+          box.dataset.qTipo='alinhamento';
+          box.dataset.ptsDinamico=ptsEfetivo;
+
+          const desc=document.createElement('div');
+          desc.className='align-desc';
+          desc.innerHTML=`<b>${escapeHtml(item.rotulo||'Critério de Alinhamento')}</b>${item.detalhe?`<small>${escapeHtml(item.detalhe)}</small>`:''}`;
+
+          const ctrls=document.createElement('div');
+          ctrls.className='align-controls';
+          const marcadas=Array.isArray(dadosAl.marcadas)?dadosAl.marcadas:[];
+          const groupName=`al_${item._idx}_${Math.random().toString(36).slice(2,7)}`;
+          const opcoes=(item.opcoes&&item.opcoes.length)?item.opcoes:['Sim','Não','N/A'];
+
+          opcoes.forEach(op=>{
+            const choice=document.createElement('label');
+            choice.className='x-choice'+(!podePreencherCampo?' disabled':'');
+            const input=document.createElement('input');
+            input.type='radio';
+            input.name=groupName;
+            input.value=op;
+            input.checked=marcadas.includes(op);
+            input.disabled=!podePreencherCampo;
+            const boxX=document.createElement('span');
+            boxX.className='x-box';
+            boxX.textContent='X';
+            const txt=document.createElement('span');
+            txt.textContent=op;
+            choice.append(input,boxX,txt);
+            ctrls.append(choice);
+          });
+
+          const ptsLbl=document.createElement('span');
+          ptsLbl.style.fontSize='11.5px';
+          ptsLbl.textContent='Pts:';
+          const ptsInp=document.createElement('input');
+          ptsInp.type='number';
+          ptsInp.min='0';
+          ptsInp.step='0.5';
+          ptsInp.className='pts-edit-inp';
+          ptsInp.dataset.alField='ptsCustom';
+          ptsInp.value=String(extrairNumeroPontos(ptsEfetivo));
+          ptsInp.disabled=!isGestor;
+          ptsInp.oninput=()=>{
+            box.dataset.ptsDinamico=ptsInp.value||'0';
+            respostasRascunho._notaManual=false;
+            recalcularPontuacaoDinamica();
+          };
+
+          const notaInp=document.createElement('input');
+          notaInp.type='text';
+          notaInp.className='inline-input';
+          notaInp.style.width='74px';
+          notaInp.dataset.alField='nota';
+          notaInp.placeholder='Obs.';
+          notaInp.value=dadosAl.nota||'';
+          notaInp.disabled=!podePreencherCampo;
+
+          ctrls.append(ptsLbl,ptsInp,notaInp,perm);
+
+          box.append(desc,ctrls);
+          body.append(box);
+        }else if(item.tipo==='fechamento_alinhamento'){
+          const dadosFc=(salvo&&typeof salvo==='object')?salvo:{texto:'',marcadas:[]};
+          const wrap=document.createElement('div');
+          wrap.dataset.qKey=chave;
+          wrap.dataset.qTipo='fechamento_alinhamento';
+          wrap.style.display='grid';
+          wrap.style.gap='6px';
+
+          const head=document.createElement('div');
+          head.className='form-q-head';
+          const lbl=document.createElement('div');
+          lbl.className='form-q-label';
+          lbl.textContent=item.rotulo||'Alinhamento / Registro';
+          head.append(lbl,perm);
+          wrap.append(head);
+
+          if(item.detalhe){
+            const det=document.createElement('div');
+            det.className='muted';
+            det.style.padding='0';
+            det.textContent=item.detalhe;
+            wrap.append(det);
+          }
+
+          if(item.opcoes&&item.opcoes.length){
+            const optsDiv=document.createElement('div');
+            optsDiv.className='form-opts';
+            const marcadas=Array.isArray(dadosFc.marcadas)?dadosFc.marcadas:[];
+            item.opcoes.forEach(op=>{
+              const choice=document.createElement('label');
+              choice.className='x-choice'+(!podePreencherCampo?' disabled':'');
+              const input=document.createElement('input');
+              input.type='checkbox';
+              input.value=op;
+              input.checked=marcadas.includes(op);
+              input.disabled=!podePreencherCampo;
+              const boxX=document.createElement('span');
+              boxX.className='x-box';
+              boxX.textContent='X';
+              const txt=document.createElement('span');
+              txt.textContent=op;
+              choice.append(input,boxX,txt);
+              optsDiv.append(choice);
+            });
+            wrap.append(optsDiv);
+          }
+
+          const linhaInp=document.createElement('input');
+          linhaInp.type='text';
+          linhaInp.className='form-dashed-line';
+          linhaInp.dataset.fcField='texto';
+          linhaInp.value=dadosFc.texto||'';
+          linhaInp.disabled=!podePreencherCampo;
+          linhaInp.placeholder=podePreencherCampo?'Preencher alinhamento / observação aqui...':'';
+          wrap.append(linhaInp);
+
+          body.append(wrap);
+        }else if(item.tipo==='linha_mista'){
+          const topFlex=document.createElement('div');
+          topFlex.style.cssText='display:flex;justify-content:space-between;align-items:flex-start;gap:10px';
+          const fluxo=renderizarFluxoMisto(item.rotulo||'',chave,salvo,podePreencherCampo);
+          fluxo.style.flex='1';
+          topFlex.append(fluxo,perm);
+          body.append(topFlex);
+        }else if(item.tipo==='linha_tracejada'){
+          const head=document.createElement('div');
+          head.className='form-q-head';
+          const lbl=document.createElement('div');
+          lbl.className='form-q-label';
+          lbl.textContent=item.rotulo||'';
+          head.append(lbl,perm);
+          body.append(head);
+
+          const inp=document.createElement('input');
+          inp.type='text';
+          inp.className='form-dashed-line';
+          inp.dataset.qKey=chave;
+          inp.dataset.qTipo='campo';
+          inp.value=typeof salvo==='string'?salvo:(salvo?.valor||'');
+          inp.disabled=!podePreencherCampo;
+          inp.placeholder=podePreencherCampo?'Escreva aqui na linha tracejada...':'';
+          body.append(inp);
+        }else{
+          const head=document.createElement('div');
+          head.className='form-q-head';
+          const lbl=document.createElement('div');
+          lbl.className='form-q-label';
+          lbl.textContent=item.rotulo||'Campo';
+          head.append(lbl,perm);
+          body.append(head);
+
+          if(item.tipo==='campo'){
+            const inp=document.createElement('input');
+            inp.type='text';
+            inp.className='form-line-input';
+            inp.dataset.qKey=chave;
+            inp.dataset.qTipo='campo';
+            inp.value=typeof salvo==='string'?salvo:(salvo?.valor||'');
+            inp.disabled=!podePreencherCampo;
+            inp.placeholder=podePreencherCampo?'Preencher aqui...':'Preenchido por Gestão / Qualidade';
+            body.append(inp);
+          }else if(item.tipo==='x_unica'||item.tipo==='x_multipla'){
+            const optsDiv=document.createElement('div');
+            optsDiv.className='form-opts';
+            optsDiv.dataset.qKey=chave;
+            optsDiv.dataset.qTipo=item.tipo;
+            const marcadas=Array.isArray(salvo)?salvo:(Array.isArray(salvo?.marcadas)?salvo.marcadas:[]);
+            const groupName=`grp_${item._idx}_${Math.random().toString(36).slice(2,7)}`;
+            const opcoes=(item.opcoes&&item.opcoes.length)?item.opcoes:['Sim','Não'];
+
+            opcoes.forEach(op=>{
+              const choice=document.createElement('label');
+              choice.className='x-choice'+(!podePreencherCampo?' disabled':'');
+              const input=document.createElement('input');
+              input.type=item.tipo==='x_unica'?'radio':'checkbox';
+              input.name=groupName;
+              input.value=op;
+              input.checked=marcadas.includes(op);
+              input.disabled=!podePreencherCampo;
+
+              const box=document.createElement('span');
+              box.className='x-box';
+              box.textContent='X';
+
+              const txt=document.createElement('span');
+              txt.textContent=op;
+
+              choice.append(input,box,txt);
+              optsDiv.append(choice);
+            });
+            body.append(optsDiv);
+          }
+        }
+
+        row.append(body);
+        sec.append(row);
+      }
+    });
+
+    sheet.append(sec);
+  });
+
+  if(blocosAssinatura.length){
+    blocosAssinatura.forEach(item=>{
+      const chave=`q_${item._idx}`;
+      const salvo=(respostasRascunho[chave]&&typeof respostasRascunho[chave]==='object')?respostasRascunho[chave]:{};
+      const legs=Array.isArray(item.assinaturas)&&item.assinaturas.length===2
+        ?item.assinaturas
+        :['Assinatura do Supervisor / Auditor de Qualidade','Ciente do Operador Auditado (Data: ____/____/2026)'];
+
+      const signGrid=document.createElement('div');
+      signGrid.className='form-sign-grid';
+      signGrid.dataset.qKey=chave;
+      signGrid.dataset.qTipo='assinaturas';
+
+      const boxEsq=document.createElement('div');
+      boxEsq.className='form-sign-box';
+      const inpEsq=document.createElement('input');
+      inpEsq.type='text';
+      inpEsq.className='form-sign-input';
+      inpEsq.dataset.signSide='esq';
+      inpEsq.value=salvo.esq||'';
+      inpEsq.disabled=!isGestor;
+      inpEsq.placeholder=isGestor?'Assinar / nome do auditor...':'';
+      const capEsq=document.createElement('div');
+      capEsq.className='form-sign-caption';
+      capEsq.textContent=legs[0];
+      boxEsq.append(inpEsq,capEsq);
+
+      const podeDir=isGestor||(item.quemPreenche==='usuario');
+      const boxDir=document.createElement('div');
+      boxDir.className='form-sign-box';
+      const inpDir=document.createElement('input');
+      inpDir.type='text';
+      inpDir.className='form-sign-input';
+      inpDir.dataset.signSide='dir';
+      inpDir.value=salvo.dir||'';
+      inpDir.disabled=!podeDir;
+      inpDir.placeholder=podeDir?'Assinatura / ciência e data...':'';
+      const capDir=document.createElement('div');
+      capDir.className='form-sign-caption';
+      capDir.textContent=legs[1];
+      boxDir.append(inpDir,capDir);
+
+      signGrid.append(boxEsq,boxDir);
+      sheet.append(signGrid);
+    });
+  }
+
+  const contestTexto=respostasRascunho._contestacao||'';
+  const cBox=document.createElement('div');
+  cBox.className='contest-box';
+  cBox.id='bloco-contestacao';
+  cBox.innerHTML=`
+    <div><i class="fa-solid fa-gavel"></i> <b>Contestação do Resultado da Monitoria de Qualidade</b></div>
+    <input type="text" class="form-dashed-line" id="fc-contestacao-texto" value="${escapeHtml(contestTexto)}" ${isGestor?'disabled':'placeholder="Se discordar da avaliação ou nota, escreva aqui sua contestação..."'}>
+    ${!isGestor?`<div><button type="button" class="btn warn" onclick="contestarResultadoQualidade()"><i class="fa-solid fa-scale-balanced"></i> Enviar contestação da monitoria</button></div>`:''}
+  `;
+  sheet.append(cBox);
+
+  if(!cfg.itens.length){
+    const p=document.createElement('p');
+    p.className='muted';p.style.padding='16px';
+    p.textContent='Este formulário ainda não possui itens configurados.';
+    sheet.append(p);
+  }
+
+  if(!conteudoVazio(htmlExtra)){
+    const extraWrap=document.createElement('div');
+    extraWrap.style.padding='0 16px 14px';
+    extraWrap.innerHTML=`<div class="art ql-editor">${htmlExtra}</div>`;
+    sheet.append(extraWrap);
+  }
+
+  const bar=document.createElement('div');
+  bar.className='form-actions-bar';
+  if(isGestor){
+    bar.innerHTML=`
+      <button type="button" class="btn" onclick="persistirFicha('rascunho')"><i class="fa-solid fa-floppy-disk"></i> Salvar rascunho</button>
+      <button type="button" class="btn pri" onclick="persistirFicha('enviada')"><i class="fa-solid fa-paper-plane"></i> Enviar ficha ao usuário</button>
+      <button type="button" class="btn pri" onclick="persistirFicha('finalizada')"><i class="fa-solid fa-check-double"></i> Finalizar ficha</button>
+      <button type="button" class="btn" onclick="voltarCapaFormulario()"><i class="fa-solid fa-arrow-left"></i> Voltar à capa</button>
+    `;
+  }else{
+    bar.innerHTML=`
+      <button type="button" class="btn pri" onclick="persistirFichaUsuario('enviada')"><i class="fa-solid fa-floppy-disk"></i> Salvar minhas respostas</button>
+      <button type="button" class="btn warn" onclick="contestarResultadoQualidade()"><i class="fa-solid fa-scale-balanced"></i> Contestar resultado da qualidade</button>
+      <button type="button" class="btn" onclick="voltarCapaFormulario()"><i class="fa-solid fa-arrow-left"></i> Voltar à capa</button>
+    `;
+  }
+  sheet.append(bar);
+  runner.append(sheet);
+
+  runner.addEventListener('change',()=>{
+    respostasRascunho._notaManual=false;
+    recalcularPontuacaoDinamica();
+  });
+  const notaEl=$('fc-nota-final');
+  if(notaEl&&isGestor){
+    notaEl.addEventListener('input',()=>{
+      respostasRascunho._notaManual=true;
+      respostasRascunho._notaFinal=notaEl.value;
+      recalcularPontuacaoDinamica(false);
+    });
+  }
+  recalcularPontuacaoDinamica(false);
+}
+
+function focarContestacao(){
+  const inp=$('fc-contestacao-texto');
+  if(!inp)return;
+  inp.scrollIntoView({behavior:'smooth',block:'center'});
+  inp.focus();
+}
+
+function coletarRespostasTela(){
+  const runner=$('form-runner');
+  const out={};
+
+  runner.querySelectorAll('.inline-flow[data-q-key]').forEach(box=>{
+    const inputs={};
+    const checks={};
+    box.querySelectorAll('input.inline-input[data-sub-key]').forEach(i=>{inputs[i.dataset.subKey]=i.value});
+    box.querySelectorAll('input[type="checkbox"][data-sub-key]').forEach(c=>{checks[c.dataset.subKey]=c.checked});
+    out[box.dataset.qKey]={inputs,checks};
+  });
+
+  runner.querySelectorAll('.align-box[data-q-key]').forEach(box=>{
+    const marcadas=[...box.querySelectorAll('input[type="radio"]:checked,input[type="checkbox"]:checked')].map(i=>i.value);
+    const nota=box.querySelector('input[data-al-field="nota"]')?.value||'';
+    const ptsCustom=box.querySelector('input[data-al-field="ptsCustom"]')?.value||'';
+    out[box.dataset.qKey]={marcadas,nota,ptsCustom};
+  });
+
+  runner.querySelectorAll('[data-q-tipo="fechamento_alinhamento"][data-q-key]').forEach(box=>{
+    const marcadas=[...box.querySelectorAll('input[type="checkbox"]:checked')].map(i=>i.value);
+    const texto=box.querySelector('input[data-fc-field="texto"]')?.value||'';
+    out[box.dataset.qKey]={marcadas,texto};
+  });
+
+  runner.querySelectorAll('input.form-line-input[data-q-key],input.form-dashed-line[data-q-key]').forEach(inp=>{
+    if(inp.id==='fc-contestacao-texto')return;
+    out[inp.dataset.qKey]={valor:inp.value};
+  });
+
+  runner.querySelectorAll('.form-opts[data-q-key]').forEach(box=>{
+    const vals=[...box.querySelectorAll('input:checked')].map(i=>i.value);
+    out[box.dataset.qKey]={marcadas:vals};
+  });
+
+  runner.querySelectorAll('.form-table-wrap[data-q-key]').forEach(wrap=>{
+    const linhas=[];
+    wrap.querySelectorAll('tbody tr').forEach(tr=>{
+      linhas.push([...tr.querySelectorAll('input')].map(i=>i.value));
+    });
+    out[wrap.dataset.qKey]=linhas;
+  });
+
+  runner.querySelectorAll('.form-sign-grid[data-q-key]').forEach(grid=>{
+    out[grid.dataset.qKey]={
+      esq:grid.querySelector('input[data-sign-side="esq"]')?.value||'',
+      dir:grid.querySelector('input[data-sign-side="dir"]')?.value||''
+    };
+  });
+
+  runner.querySelectorAll('input[data-q-lead-key]').forEach(chk=>{
+    const k=chk.dataset.qLeadKey;
+    if(out[k]&&typeof out[k]==='object'&&!Array.isArray(out[k])){
+      out[k].leadChecked=chk.checked;
+    }else{
+      out[k]={valor:out[k]||'',leadChecked:chk.checked};
+    }
+  });
+
+  return out;
+}
+
+async function persistirFicha(novoStatus){
+  if(!podeGerirFormularios())return alert('Apenas Editor, Qualidade, Supervisor, Coordenador, Gerente ou Admin pode enviar ou finalizar fichas.');
+  if(!cur||!user)return;
+
+  const destEmail=($('fc-dest-email')?.value||'').trim();
+  if(!destEmail)return alert('Informe o e-mail do usuário que receberá esta ficha.');
+
+  const reg=cur.kind==='natureza'?artigoDe(N.find(x=>x.id===cur.id)):T.find(x=>x.id===cur.id);
+  const tituloForm=cur.kind==='natureza'?(N.find(x=>x.id===cur.id)?.natureza||'Formulário'):(reg?.titulo||'Formulário');
+  const notaVal=$('fc-nota-final')?$('fc-nota-final').value:(respostasRascunho._notaFinal||'0');
+
+  const respostas={
+    ...coletarRespostasTela(),
+    _contestacao:respostasRascunho._contestacao||'',
+    _notaFinal:notaVal,
+    _notaManual:!!respostasRascunho._notaManual
+  };
+
+  try{
+    if(fichaAtivaId){
+      const{error}=await sb.from('FICHAS_PREENCHIDAS').update({
+        usuario_email:destEmail,
+        avaliador_email:user.email,
+        status:novoStatus,
+        respostas,
+        updated_at:new Date().toISOString()
+      }).eq('id',fichaAtivaId);
+      if(error)throw error;
+    }else{
+      const{data,error}=await sb.from('FICHAS_PREENCHIDAS').insert([{
+        origem_kind:cur.kind,
+        origem_id:cur.id,
+        titulo_formulario:tituloForm,
+        usuario_email:destEmail,
+        avaliador_email:user.email,
+        status:novoStatus,
+        respostas
+      }]).select().single();
+      if(error)throw error;
+      fichaAtivaId=data.id;
+    }
+    respostasRascunho={...respostas,_destinatarioEmail:destEmail,_status:novoStatus};
+    await carregarFichasPreenchidas();
+    if($('fc-status-label')){
+      $('fc-status-label').textContent=novoStatus.toUpperCase();
+      $('fc-status-label').className=`status-pill ${novoStatus}`;
+    }
+    alert(novoStatus==='finalizada'?'Ficha finalizada e salva no banco!':(novoStatus==='enviada'?'Ficha enviada para o usuário!':'Rascunho salvo!'));
+  }catch(err){
+    console.error(err);
+    alert('Erro ao salvar ficha: '+err.message);
+  }
+}
+
+async function persistirFichaUsuario(statusForcado=null){
+  if(!user||!fichaAtivaId)return;
+  const fc=FICHAS.find(x=>x.id===fichaAtivaId);
+  if(!fc)return;
+
+  const reg=cur.kind==='natureza'?artigoDe(N.find(x=>x.id===cur.id)):T.find(x=>x.id===cur.id);
+  const cfg=normalizarFormConfig(reg?.form_config);
+  const atuais=coletarRespostasTela();
+  const mesclado={...(fc.respostas||{})};
+
+  cfg.itens.forEach((it,idx)=>{
+    const k=`q_${idx}`;
+    if(it.quemPreenche==='usuario'&&k in atuais){
+      mesclado[k]=atuais[k];
+    }else if(it.tipo==='assinaturas'&&atuais[k]){
+      mesclado[k]={
+        ...(mesclado[k]&&typeof mesclado[k]==='object'?mesclado[k]:{}),
+        dir:atuais[k].dir
+      };
+    }
+  });
+
+  const textoContest=($('fc-contestacao-texto')?.value??mesclado._contestacao??'').trim();
+  mesclado._contestacao=textoContest;
+  const statusFinal=statusForcado||(fc.status==='contestada'?'contestada':'enviada');
+
+  try{
+    const{error}=await sb.from('FICHAS_PREENCHIDAS').update({
+      usuario_id:user.id,
+      status:statusFinal,
+      respostas:mesclado,
+      updated_at:new Date().toISOString()
+    }).eq('id',fichaAtivaId);
+    if(error)throw error;
+    respostasRascunho={...mesclado,_destinatarioEmail:fc.usuario_email,_status:statusFinal,_contestacao:textoContest};
+    await carregarFichasPreenchidas();
+    return true;
+  }catch(err){
+    console.error(err);
+    alert('Erro ao salvar suas respostas: '+err.message);
+    return false;
+  }
+}
+
+async function contestarResultadoQualidade(){
+  const inp=$('fc-contestacao-texto');
+  if(!inp)return;
+  const motivo=inp.value.trim();
+  if(!motivo){
+    inp.focus();
+    return alert('Digite o motivo ou justificativa da contestação antes de enviar.');
+  }
+  const ok=await persistirFichaUsuario('contestada');
+  if(ok){
+    alert('Contestação registrada e enviada para análise da Qualidade / Gestão!');
+    reabrirAtualSemLimpar();
+  }
+}
+
+function voltarCapaFormulario(){
+  formIniciado=false;fichaAtivaId=null;
+  reabrirAtualSemLimpar();
+}
+
+function selecionarNatureza(id,limpar=true){
   const n=N.find(x=>x.id===id);if(!n)return;
-  cur=n.id;cancelarEdicao();
+  if(!(cur?.kind==='natureza'&&cur.id===n.id)){formIniciado=false;fichaAtivaId=null}
+  cur={kind:'natureza',id:n.id};cancelarEdicao();
   if(limpar){$('busca').value='';fecharBusca()}
   $('home').classList.add('hidden');$('artigo').classList.remove('hidden');$('rail-art').classList.remove('hidden');
-  $('titulo').textContent=n.natureza;
   const art=artigoDe(n);
+  $('aba-tipo').textContent=art?.eh_formulario?'Formulário da natureza':'Artigo da natureza';
+  $('titulo').textContent=n.natureza;
+
   const vinc=N.filter(x=>x.artigo_id&&x.artigo_id===n.artigo_id&&x.id!==n.id);
-  $('subtitulo').textContent=vinc.length?`Este artigo é compartilhado com ${vinc.length} ${vinc.length===1?'outra natureza':'outras naturezas'}.`:'Artigo exclusivo desta natureza.';
+  const autorInfo=art?(art.editado_por||art.autor_email):'';
+  $('subtitulo').textContent=[
+    vinc.length?`Compartilhado com ${vinc.length} ${vinc.length===1?'outra natureza':'outras naturezas'}.`:'Item exclusivo desta natureza.',
+    autorInfo?`Último registro por: ${autorInfo}`:''
+  ].filter(Boolean).join(' · ');
+
   const tags=$('vinculos');tags.replaceChildren();
-  vinc.forEach(v=>{const b=document.createElement('button');b.type='button';b.textContent=`${v.id} · ${v.natureza}`;b.onclick=()=>selecionar(v.id);tags.append(b)});
+  vinc.forEach(v=>{
+    const b=document.createElement('button');b.type='button';
+    b.textContent=`${v.id} · ${v.natureza}`;
+    b.onclick=()=>selecionarNatureza(v.id);
+    tags.append(b);
+  });
+
+  $('ficha-titulo').textContent='Ficha da natureza';
+  $('row-cod').classList.remove('hidden');
+  $('row-cat').classList.add('hidden');
+  $('row-art').classList.remove('hidden');
+  $('row-vinc').classList.remove('hidden');
   $('f-cod').textContent=n.id;
   $('f-art').textContent=art?'#'+art.id:'—';
   $('f-vinc').textContent=vinc.length;
+  $('f-autor').textContent=art?.autor_email||'—';
+  $('f-editor').textContent=art?.editado_por||'—';
   $('f-data').textContent=art?(dataCurta(art.updated_at||art.created_at)||'—'):'—';
-  const corpo=$('corpo');
-  if(art&&!conteudoVazio(art.conteudo))corpo.innerHTML=art.conteudo;
-  else corpo.innerHTML='<p class="empty">Nenhuma orientação cadastrada para esta natureza até o momento.</p>';
-  $('btn-excluir').classList.toggle('hidden',!(art&&art.conteudo));
+
+  renderizarVisualizacao(n.natureza,art);
+  $('btn-excluir').classList.toggle('hidden',!temAlgumConteudo(art));
   montarToc();uiPermissoes();atualizarSidebar();
   if(limpar)window.scrollTo(0,0);
 }
 
-/* ===== Edição ===== */
+function selecionarTopico(id,limpar=true){
+  const t=T.find(x=>x.id===id);if(!t)return;
+  if(!(cur?.kind==='topico'&&cur.id===t.id)){formIniciado=false;fichaAtivaId=null}
+  cur={kind:'topico',id:t.id};cancelarEdicao();
+  if(limpar){$('busca').value='';fecharBusca()}
+  $('home').classList.add('hidden');$('artigo').classList.remove('hidden');$('rail-art').classList.remove('hidden');
+  $('aba-tipo').textContent=t.eh_formulario?'Formulário COPOM':'Tópico COPOM';
+  $('titulo').textContent=t.titulo;
+  const autorInfo=t.editado_por||t.autor_email;
+  $('subtitulo').textContent=`Categoria: ${t.categoria||'Geral'}${autorInfo?` · Último registro por: ${autorInfo}`:''}`;
+  $('vinculos').replaceChildren();
+
+  $('ficha-titulo').textContent='Ficha do tópico';
+  $('row-cod').classList.add('hidden');
+  $('row-cat').classList.remove('hidden');
+  $('row-art').classList.add('hidden');
+  $('row-vinc').classList.add('hidden');
+  $('f-cat').textContent=t.categoria||'Geral';
+  $('f-autor').textContent=t.autor_email||'—';
+  $('f-editor').textContent=t.editado_por||'—';
+  $('f-data').textContent=dataCurta(t.updated_at||t.created_at)||'—';
+
+  renderizarVisualizacao(t.titulo,t);
+  $('btn-excluir').classList.remove('hidden');
+  montarToc();uiPermissoes();atualizarSidebar();
+  if(limpar)window.scrollTo(0,0);
+}
+
+function abrirNovoTopico(){
+  if(!podeCriarTopico())return alert('Acesso negado: o cargo "Qualidade" atua apenas em artigos de natureza/ocorrências e monitorias. Para tópicos COPOM, use Editor, Supervisor, Coordenador, Gerente ou Admin.');
+  $('t-titulo').value='';
+  $('t-cat').value='Formulários e Fichas';
+  $('t-msg').textContent='';
+  $('modal-topico').classList.remove('hidden');
+  $('t-titulo').focus();
+}
+function fecharNovoTopico(){$('modal-topico').classList.add('hidden')}
+
+$('form-topico').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!podeCriarTopico())return alert('Acesso negado.');
+  const titulo=$('t-titulo').value.trim();
+  const categoria=$('t-cat').value;
+  if(!titulo){$('t-msg').textContent='Informe o título do tópico.';return}
+  $('t-ok').disabled=true;$('t-msg').textContent='Criando tópico...';
+  try{
+    const quem=user?.email||'editor';
+    const{data,error}=await sb
+      .from('TOPICOS_COPOM')
+      .insert([{titulo,categoria,conteudo:'',autor_email:quem,editado_por:quem}])
+      .select().single();
+    if(error)throw error;
+    fecharNovoTopico();
+    await carregarDados();
+    selecionarTopico(data.id,true);
+    ativarEdicao();
+  }catch(err){
+    console.error(err);
+    $('t-msg').textContent=err.message||'Não foi possível criar o tópico.';
+  }finally{
+    $('t-ok').disabled=false;
+  }
+});
+
 function iniciarQuill(){
   if(quill)return;
   const P=Quill.import('parchment');
@@ -471,7 +2059,255 @@ function iniciarQuill(){
   });
   $('arquivo').addEventListener('change',async e=>{const f=e.target.files[0];if(f)await enviarArquivo(f);e.target.value=''});
 }
-/* ===== Cor e efeitos de texto ===== */
+
+function toggleFormBuilder(ativo){
+  $('chk-eh-form').checked=!!ativo;
+  $('form-builder-panel').classList.toggle('hidden',!ativo);
+  if(ativo)renderBuilderItens();
+}
+
+function ajustarCamposConstrutor(){
+  const tipo=$('fb-tipo').value;
+  $('wrap-fb-opcoes').classList.toggle('hidden',tipo!=='x_unica'&&tipo!=='x_multipla'&&tipo!=='alinhamento'&&tipo!=='fechamento_alinhamento');
+  $('wrap-fb-colunas').classList.toggle('hidden',tipo!=='tabela');
+  $('wrap-fb-assinaturas').classList.toggle('hidden',tipo!=='assinaturas');
+  $('wrap-fb-secao').classList.toggle('hidden',tipo==='grade_topo'||tipo==='assinaturas');
+  $('wrap-fb-pontos').classList.toggle('hidden',tipo!=='alinhamento');
+  $('wrap-fb-detalhe').classList.toggle('hidden',tipo!=='alinhamento'&&tipo!=='fechamento_alinhamento');
+  $('wrap-fb-check-esq').classList.toggle('hidden',tipo==='grade_topo'||tipo==='tabela'||tipo==='assinaturas'||tipo==='alinhamento'||tipo==='fechamento_alinhamento');
+  $('wrap-fb-rotulo').classList.toggle('hidden',tipo==='assinaturas');
+}
+
+function inserirAtalhoModelo(snippet){
+  const inp=$('fb-rotulo');
+  const pos=inp.selectionStart??inp.value.length;
+  inp.value=inp.value.slice(0,pos)+snippet+inp.value.slice(pos);
+  inp.focus();
+}
+
+function adicionarItemFormulario(){
+  const tipo=$('fb-tipo').value;
+  const quemPreenche=$('fb-quem-preenche').value;
+  const secao=$('fb-secao').value.trim()||'Alinhamento e Preenchimento Final';
+  const rotulo=$('fb-rotulo').value.trim();
+  const pontos=$('fb-pontos').value.trim()||'10';
+  const detalhe=$('fb-detalhe').value.trim();
+  const checkEsq=$('fb-check-esq').value==='sim';
+  if(tipo!=='tabela'&&tipo!=='assinaturas'&&!rotulo)return alert('Informe o título/descrição do item.');
+
+  const opcoesRaw=$('fb-opcoes').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const opcoes=(tipo==='fechamento_alinhamento')
+    ?opcoesRaw
+    :(opcoesRaw.length?opcoesRaw:(tipo==='alinhamento'?['Sim','Não','N/A']:['Sim','Não']));
+  const colunas=$('fb-colunas').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const assinaturas=$('fb-assinaturas').value.split('|').map(s=>s.trim()).filter(Boolean);
+
+  rascunhoForm.itens.push({
+    tipo,
+    quemPreenche,
+    checkEsq,
+    secao,
+    rotulo:rotulo||(tipo==='tabela'?'Histórico':(tipo==='assinaturas'?'Assinaturas':'Item')),
+    pontos,
+    detalhe,
+    opcoes,
+    colunas:colunas.length?colunas:['Data','Protocolo CAD','Duração','Nota Final','Principal Ponto Observado'],
+    assinaturas:assinaturas.length>=2?assinaturas.slice(0,2):['Assinatura do Supervisor / Auditor de Qualidade','Ciente do Operador Auditado (Data: ____/____/2026)']
+  });
+  $('fb-rotulo').value='';
+  $('fb-pontos').value='';
+  $('fb-detalhe').value='';
+  renderBuilderItens();
+}
+
+function removerItemFormulario(idx){
+  rascunhoForm.itens.splice(idx,1);
+  renderBuilderItens();
+}
+
+function renderBuilderItens(){
+  const box=$('fb-lista-itens');
+  box.replaceChildren();
+  if(!rascunhoForm.itens.length){
+    box.innerHTML='<p class="muted">Nenhum item adicionado ao formulário ainda.</p>';
+    return;
+  }
+  rascunhoForm.itens.forEach((it,idx)=>{
+    const div=document.createElement('div');
+    div.className='builder-item';
+    const mapaTipo={
+      alinhamento:'Alinhamento/Critério',
+      fechamento_alinhamento:'Fechamento/Alinhamento',
+      linha_mista:'Linha mista',
+      linha_tracejada:'Linha tracejada',
+      grade_topo:'Grade topo',
+      assinaturas:'Assinaturas',
+      x_unica:'Marcar X (1)',
+      x_multipla:'Marcar X (vários)',
+      tabela:'Tabela',
+      campo:'Campo simples'
+    };
+    const tipoLabel=mapaTipo[it.tipo]||'Campo';
+    const permLabel=it.quemPreenche==='usuario'?'Usuário preenche':'Só Gestão/Qualidade';
+    const prefixo=it.tipo==='grade_topo'?'[Grade Topo]':(it.tipo==='assinaturas'?'[Assinaturas]':`[${it.secao}]`);
+    const ptsBadge=(it.tipo==='alinhamento'&&it.pontos)?` · <b>${escapeHtml(String(it.pontos))} pts</b>`:'';
+    const desc=it.tipo==='assinaturas'?(it.assinaturas||[]).join(' | '):it.rotulo;
+    div.innerHTML=`<div><b>${escapeHtml(prefixo)}</b> ${escapeHtml(desc)}${ptsBadge} <small class="muted">(${tipoLabel} · ${permLabel})</small></div>`;
+    const del=document.createElement('button');
+    del.type='button';del.className='btn danger';
+    del.innerHTML='<i class="fa-solid fa-trash"></i>';
+    del.onclick=()=>removerItemFormulario(idx);
+    div.append(del);
+    box.append(div);
+  });
+}
+
+function aplicarModeloManual190P4a6(){
+  toggleFormBuilder(true);
+  rascunhoForm={
+    subtitulo:'Sistema Integrado de Qualidade e Eficiência Operacional • Manual Normativo 190 (Pág. 4 a 6)',
+    headerCor:'#1e3a5f',
+    accentCor:'#1e3a5f',
+    bgCor:'#ffffff',
+    formato:'padrao',
+    itens:[
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Matrícula / ID: [campo:120]',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Analista / Operador Avaliado: [campo:170]',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Data: [campo:42] / [campo:42] / 2026',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Supervisor / Auditor: [campo:170]',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Protocolo CAD: [campo:130]',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Duração: [campo:38] m [campo:38] s',opcoes:[],colunas:[]},
+      {tipo:'linha_mista',quemPreenche:'qualidade',checkEsq:false,secao:'Fase 3 — Ficha de Monitoria e Auditoria (Rotina Semanal)',rotulo:'Período: [x:Dia Útil] [x:Final de Semana / Pico]  |  Tipo: [x:Áudio Retrospectivo] [x:Tempo Real (Escuta Ativa)]',opcoes:[],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 1: Abertura e Identificação da Necessidade (10 Pontos)',rotulo:'1.1 Prontidão e Abertura',pontos:'5',detalhe:'Atendeu em até 3-5s, usou fraseologia padrão ("Polícia Militar, emergência...") e direcionou com clareza.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 1: Abertura e Identificação da Necessidade (10 Pontos)',rotulo:'1.2 Identificação',pontos:'5',detalhe:'Identificou imediatamente a natureza da ocorrência (e se está em andamento) e iniciou o registro.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 2: Coleta de Dados, Análise de Risco e Complementos (45 Pontos)',rotulo:'2.1 Localização Completa',pontos:'15',detalhe:'Solicitou endereço completo, bairro, telefone e referência. Se ausente no SADE, aplicou regra dos 20s (cruzamento/mapa auxiliar).',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 2: Coleta de Dados, Análise de Risco e Complementos (45 Pontos)',rotulo:'2.2 Fato e Vítimas',pontos:'8',detalhe:'Entendeu e registrou corretamente a dinâmica do fato e identificou vítimas e seu estado de saúde.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 2: Coleta de Dados, Análise de Risco e Complementos (45 Pontos)',rotulo:'2.3 Verificação de Autor',pontos:'7',detalhe:'Verificou se o autor está no local ou sentido de fuga, características físicas, vestimentas e veículos.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 2: Coleta de Dados, Análise de Risco e Complementos (45 Pontos)',rotulo:'2.4 Análise de Risco',pontos:'10',detalhe:'Verificou risco imediato (armas, disparos, reféns), avaliou nível de urgência e demonstrou prontidão.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 2: Coleta de Dados, Análise de Risco e Complementos (45 Pontos)',rotulo:'2.5 Coleta Complementar',pontos:'5',detalhe:'Coletou informações adicionais relevantes conforme a ocorrência, sem excessos investigativos.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 3: Comunicação, Empatia e Gestão da Ligação (25 Pontos)',rotulo:'3.1 Comunicação Profissional',pontos:'9',detalhe:'Comunicação clara, dicção nítida e postura respeitosa (sem ironia, rispidez ou elevação de voz).',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 3: Comunicação, Empatia e Gestão da Ligação (25 Pontos)',rotulo:'3.2 Empatia e Controle',pontos:'9',detalhe:'Contenção verbal em casos de pânico e corte firme/educado de conversas desnecessárias.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 3: Comunicação, Empatia e Gestão da Ligação (25 Pontos)',rotulo:'3.3 Gestão do Tempo',pontos:'7',detalhe:'Informou pausas quando necessário, manteve orientação e gerenciou tempo dentro da meta (60s).',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 4: Processos, Sistema e Encerramento Técnico (20 Pontos)',rotulo:'4.1 Fluxo no Sistema',pontos:'12',detalhe:'Seguiu o POP, digitou concomitantemente no CAD/SADE com clareza e classificou a prioridade.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 4: Processos, Sistema e Encerramento Técnico (20 Pontos)',rotulo:'4.2 Encerramento Técnico',pontos:'8',detalhe:'Confirmou o endereço registrado, passou orientações de segurança e liberou a linha de forma ágil.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'x_multipla',quemPreenche:'qualidade',checkEsq:false,secao:'Penalidades Críticas - Tolerância Zero (Gera Nota Zero Geral e Feedback Imediato)',rotulo:'Marque as penalidades críticas constatadas (qualquer marcação zera a nota):',opcoes:[
+        'Erro Geográfico Fatal: Endereço/bairro errado inviabilizando viatura.',
+        'Omissão de Risco Vital: Não perguntar sobre armas ou feridos graves.',
+        'Classificação Incorreta: Tratar emergência grave como fato simples.',
+        'Descortesia Grave: Ironia, grosseria, insulto ou discussão.',
+        'Desconexão Proposital: Desligar antes de concluir o protocolo.',
+        'Omissão Administrativa: Recusar registro legítimo por julgamento.'
+      ],colunas:[]},
+      {tipo:'x_unica',quemPreenche:'qualidade',checkEsq:false,secao:'Classificação do Operador e Providência Gerencial',rotulo:'Classificação do Operador:',opcoes:['90-100 pts: Excelente (Padrão Ouro)','75-89 pts: Adequado (Operacional)','<75 pts: Abaixo do Padrão (Reciclagem)'],colunas:[]},
+      {tipo:'x_unica',quemPreenche:'qualidade',checkEsq:false,secao:'Classificação do Operador e Providência Gerencial',rotulo:'Providência Gerencial:',opcoes:['Manutenção na Escala / Elogio','Feedback Corretivo em Sala','Trilha de Reciclagem Técnica'],colunas:[]},
+      {tipo:'fechamento_alinhamento',quemPreenche:'usuario',checkEsq:false,secao:'Alinhamento e Observações da Monitoria',rotulo:'Pontos Fortes e Não Conformidades Observadas:',detalhe:'',opcoes:[],colunas:[]},
+      {tipo:'fechamento_alinhamento',quemPreenche:'usuario',checkEsq:false,secao:'Alinhamento e Observações da Monitoria',rotulo:'Ação Corretiva Acordada (Ex.: escuta conjunta, treino de fraseologia de corte):',detalhe:'',opcoes:[],colunas:[]},
+      {tipo:'assinaturas',quemPreenche:'usuario',checkEsq:false,secao:'',rotulo:'',opcoes:[],colunas:[],assinaturas:['Assinatura do Supervisor / Auditor de Qualidade','Ciente do Operador Auditado (Data: ____/____/2026)']},
+      {tipo:'linha_mista',quemPreenche:'qualidade',checkEsq:false,secao:'Fase 4: Checklist Mensal — Monitoria de Qualidade e Ciclo PDCA',rotulo:'Mês / Ano de Referência: [campo:55] / 2026  |  Monitor Responsável: [campo:150]  |  Turno / Equipe: [campo:130]',opcoes:[],colunas:[]},
+      {tipo:'x_multipla',quemPreenche:'qualidade',checkEsq:false,secao:'4.1 Coleta de Indicadores (Números do Mês)',rotulo:'Itens conferidos:',opcoes:[
+        'Verificar tempos médios (TME e TMA): Comparar o tempo de espera e o tempo de triagem com a meta operacional de até 60 segundos.',
+        'Medir a Taxa de Abandono: Identificar os dias e horários com mais ligações desligadas antes do atendimento para sugerir ajustes na escala.',
+        'Checar Rechamadas e Erros: Levantar quantos cidadãos ligaram novamente ou tiveram ocorrências registradas com endereço incorreto.'
+      ],colunas:[]},
+      {tipo:'x_multipla',quemPreenche:'qualidade',checkEsq:false,secao:'4.2 Auditoria de Ligações e Aderência ao POP',rotulo:'Itens conferidos:',opcoes:[
+        'Consolidar escutas semanais: Revisar as 5 chamadas mais demoradas de cada turno na semana e mapear o segundo exato em que a conversa perdeu o foco.',
+        'Avaliar a Regra dos 3 Pilares: Conferir se os analistas coletaram apenas Onde, O quê e Risco, sem perguntas investigativas.',
+        'Checar o Controle da Ligação: Verificar se os analistas utilizaram as frases padrão de interrupção educada para cortar relatos longos.'
+      ],colunas:[]},
+      {tipo:'x_multipla',quemPreenche:'qualidade',checkEsq:false,secao:'4.3 Atualização de Sistemas e Gargalos (Ciclo PDCA & 5 Porquês)',rotulo:'Itens conferidos:',opcoes:[
+        'Levantar ruas não encontradas (Plan / Do): Reunir as anotações de endereços ausentes no sistema SADE e enviar a lista para a TI atualizar a base.',
+        'Auditar o Protocolo de Tripla Confirmação (Check): Conferir se os registros sem rua exata contêm ponto de referência fixo e cruzamento próximo na observação, validados no mapa auxiliar.',
+        'Aplicar os 5 Porquês (Act): Investigar qualquer falha grave ou demora excessiva no despacho (falha no SADE, excesso de perguntas, falta de viatura) para corrigir a causa raiz.'
+      ],colunas:[]},
+      {tipo:'x_multipla',quemPreenche:'qualidade',checkEsq:false,secao:'4.4 Feedback, Saúde da Equipe e Planejamento',rotulo:'Itens conferidos:',opcoes:[
+        'Dar retorno individual: Realizar alinhamento breve com cada analista sobre os pontos positivos e os ajustes observados nas fichas semanais.',
+        'Avaliar fadiga e ergonomia: Verificar se as pausas programadas após chamadas traumáticas estão sendo cumpridas e se headsets, cadeiras e telas estão em boas condições.',
+        'Registrar o plano do próximo mês: Definir uma melhoria prioritária para testar no ciclo seguinte.'
+      ],colunas:[]},
+      {tipo:'fechamento_alinhamento',quemPreenche:'usuario',checkEsq:false,secao:'Fechamento Mensal PDCA e Vistos',rotulo:'Principais Achados do Mês e Ação Prioritária para o Próximo Ciclo (PDCA):',detalhe:'',opcoes:[],colunas:[]},
+      {tipo:'assinaturas',quemPreenche:'usuario',checkEsq:false,secao:'',rotulo:'',opcoes:[],colunas:[],assinaturas:['Assinatura do Monitor de Qualidade','Visto da Supervisão / Chefia Operacional']}
+    ]
+  };
+  sincronizarCamposBuilderNaTela();
+}
+
+function aplicarModeloMonitoriaSemanal(){
+  toggleFormBuilder(true);
+  rascunhoForm={
+    subtitulo:'Fase 3 • Ficha de Monitoria e Auditoria de Qualidade (Rotina Semanal - TQM / ISO 9000)',
+    headerCor:'#1e3a5f',
+    accentCor:'#1e3a5f',
+    bgCor:'#ffffff',
+    formato:'padrao',
+    itens:[
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Matrícula / ID: [campo:120]',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Analista / Operador Avaliado: [campo:170]',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Data: [campo:42] / [campo:42] / 2026',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Supervisor / Auditor: [campo:170]',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Protocolo CAD: [campo:130]',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Duração: [campo:38] m [campo:38] s',opcoes:[],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 1 — Abertura e Identificação (10 pts)',rotulo:'1.1 Prontidão e Abertura',pontos:'5',detalhe:'Atendeu em até 3-5s, usou fraseologia padrão ("Polícia Militar, emergência...") e direcionou com clareza.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 1 — Abertura e Identificação (10 pts)',rotulo:'1.2 Identificação',pontos:'5',detalhe:'Identificou imediatamente a natureza da ocorrência (e se está em andamento) e iniciou o registro.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 2 — Coleta de Dados, Análise de Risco e Complementos (45 pts)',rotulo:'2.1 Localização Completa',pontos:'15',detalhe:'Solicitou endereço completo, bairro, telefone e referência. Se ausente no SADE, aplicou regra dos 20s.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 2 — Coleta de Dados, Análise de Risco e Complementos (45 pts)',rotulo:'2.2 Fato e Vítimas',pontos:'8',detalhe:'Entendeu e registrou corretamente a dinâmica do fato e identificou vítimas e seu estado de saúde.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 2 — Coleta de Dados, Análise de Risco e Complementos (45 pts)',rotulo:'2.3 Verificação de Autor',pontos:'7',detalhe:'Verificou se o autor está no local ou sentido de fuga, características físicas, vestimentas e veículos.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 2 — Coleta de Dados, Análise de Risco e Complementos (45 pts)',rotulo:'2.4 Análise de Risco',pontos:'10',detalhe:'Verificou risco imediato (armas, disparos, reféns), avaliou nível de urgência e demonstrou prontidão.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 2 — Coleta de Dados, Análise de Risco e Complementos (45 pts)',rotulo:'2.5 Coleta Complementar',pontos:'5',detalhe:'Coletou informações adicionais relevantes conforme a ocorrência, sem excessos investigativos.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 3 — Comunicação, Empatia e Gestão da Ligação (25 pts)',rotulo:'3.1 Comunicação Profissional',pontos:'9',detalhe:'Comunicação clara, dicção nítida e postura respeitosa (sem ironia, rispidez ou elevação de voz).',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 3 — Comunicação, Empatia e Gestão da Ligação (25 pts)',rotulo:'3.2 Empatia e Controle',pontos:'9',detalhe:'Contenção verbal em casos de pânico e corte firme/educado de conversas desnecessárias.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 3 — Comunicação, Empatia e Gestão da Ligação (25 pts)',rotulo:'3.3 Gestão do Tempo',pontos:'7',detalhe:'Informou pausas quando necessário, manteve orientação e gerenciou tempo dentro da meta (60s).',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 4 — Processos, Sistema e Encerramento Técnico (20 pts)',rotulo:'4.1 Fluxo no Sistema',pontos:'12',detalhe:'Seguiu o POP, digitou concomitantemente no CAD/SADE com clareza e classificou a prioridade.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 4 — Processos, Sistema e Encerramento Técnico (20 pts)',rotulo:'4.2 Encerramento Técnico',pontos:'8',detalhe:'Confirmou o endereço registrado, passou orientações de segurança e liberou a linha de forma ágil.',opcoes:['Sim','Não','N/A'],colunas:[]},
+      {tipo:'x_multipla',quemPreenche:'qualidade',checkEsq:false,secao:'Penalidades Críticas - Tolerância Zero (Gera Nota Zero Geral e Feedback Imediato)',rotulo:'Marque as penalidades críticas constatadas:',opcoes:[
+        'Erro Geográfico Fatal: Endereço/bairro errado inviabilizando viatura.',
+        'Omissão de Risco Vital: Não perguntar sobre armas ou feridos graves.',
+        'Classificação Incorreta: Tratar emergência grave como fato simples.',
+        'Descortesia Grave: Ironia, grosseria, insulto ou discussão.',
+        'Desconexão Proposital: Desligar antes de concluir o protocolo.',
+        'Omissão Administrativa: Recusar registro legítimo por julgamento.'
+      ],colunas:[]},
+      {tipo:'fechamento_alinhamento',quemPreenche:'usuario',checkEsq:false,secao:'Alinhamento e Preenchimento Final',rotulo:'Pontos Fortes e Não Conformidades Observadas:',detalhe:'',opcoes:[],colunas:[]},
+      {tipo:'fechamento_alinhamento',quemPreenche:'usuario',checkEsq:false,secao:'Alinhamento e Preenchimento Final',rotulo:'Ação Corretiva Acordada (Ex.: escuta conjunta, treino de fraseologia de corte):',detalhe:'',opcoes:['Manutenção na Escala / Elogio','Feedback Corretivo em Sala','Trilha de Reciclagem Técnica'],colunas:[]},
+      {tipo:'assinaturas',quemPreenche:'usuario',checkEsq:false,secao:'',rotulo:'',opcoes:[],colunas:[],assinaturas:['Assinatura do Supervisor / Auditor de Qualidade','Ciente do Operador Auditado (Data: ____/____/2026)']}
+    ]
+  };
+  sincronizarCamposBuilderNaTela();
+}
+
+function aplicarModeloFicha190(){
+  toggleFormBuilder(true);
+  rascunhoForm={
+    subtitulo:'Gestão da Qualidade (TQM / ISO 9000) • Evolução de Desempenho, Auditorias e Plano de Ação (COPOM / CIOSP)',
+    headerCor:'#1e3a5f',
+    accentCor:'#1e3a5f',
+    bgCor:'#ffffff',
+    formato:'padrao',
+    itens:[
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Operador Avaliado: [campo:180]',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Matrícula / ID: [campo:130]',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Período / Mês: [campo:65] / 2026',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Supervisor / Auditor: [campo:180]',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Turno / Equipe: [campo:130]',opcoes:[],colunas:[]},
+      {tipo:'grade_topo',quemPreenche:'qualidade',checkEsq:false,secao:'',rotulo:'Qtd. Auditorias: [campo:75]',opcoes:[],colunas:[]},
+      {tipo:'tabela',quemPreenche:'qualidade',checkEsq:false,secao:'Histórico das Auditorias Realizadas no Período',rotulo:'Histórico',opcoes:[],colunas:['Data (____/____/2026)','Protocolo CAD','Duração (__m __s)','Nota Final (___/100)','Principal Ponto Observado']},
+      {tipo:'fechamento_alinhamento',quemPreenche:'usuario',checkEsq:false,secao:'Feedback, Plano de Ação (PDCA) e Providência Gerencial',rotulo:'Pontos Fortes e Não Conformidades Observadas:',detalhe:'',opcoes:[],colunas:[]},
+      {tipo:'fechamento_alinhamento',quemPreenche:'usuario',checkEsq:false,secao:'Feedback, Plano de Ação (PDCA) e Providência Gerencial',rotulo:'Ação Corretiva Acordada:',detalhe:'',opcoes:['Manutenção na Escala / Elogio','Feedback Corretivo em Sala','Trilha de Reciclagem Técnica'],colunas:[]},
+      {tipo:'assinaturas',quemPreenche:'usuario',checkEsq:false,secao:'',rotulo:'',opcoes:[],colunas:[],assinaturas:['Assinatura do Supervisor / Auditor de Qualidade','Ciente do Operador Avaliado (Data: ____/____/2026)']}
+    ]
+  };
+  sincronizarCamposBuilderNaTela();
+}
+
+function sincronizarCamposBuilderNaTela(){
+  $('fb-subtitulo').value=rascunhoForm.subtitulo||'';
+  $('fb-header-cor').value=rascunhoForm.headerCor||'#1e3a5f';
+  $('fb-accent-cor').value=rascunhoForm.accentCor||'#1e3a5f';
+  $('fb-bg-cor').value=rascunhoForm.bgCor||'#ffffff';
+  $('fb-formato').value=rascunhoForm.formato||'padrao';
+  ajustarCamposConstrutor();
+  renderBuilderItens();
+}
+
 function corDigitando(v){if(!quill)return;quill.focus();quill.format('color',v,'user')}
 function resetCor(){if(!quill)return;quill.focus();quill.format('color',false,'user')}
 function fxAplicar(fmt,val){
@@ -488,21 +2324,37 @@ function limparFx(){
   if(r&&r.length){['fxestilo','fxanim','fxcolor'].forEach(f=>quill.format(f,false,'user'))}
   ['fx-estilo','fx-anim','fx-cor'].forEach(i=>$(i).value='');
 }
+
 function ativarEdicao(){
-  if(!podeEditar())return alert('Acesso negado: apenas Editor ou Admin podem editar.');
-  const n=N.find(x=>x.id===cur);if(!n)return;
+  if(!podeEditarAtual())return alert('Acesso negado para editar este item com o cargo atual.');
+  if(!cur)return;
   iniciarQuill();
-  quill.root.innerHTML=artigoDe(n)?.conteudo||'';
+
+  let reg=null;
+  if(cur.kind==='natureza'){
+    const n=N.find(x=>x.id===cur.id);if(!n)return;
+    reg=artigoDe(n);
+  }else{
+    reg=T.find(x=>x.id===cur.id);if(!reg)return;
+  }
+
+  quill.root.innerHTML=reg?.conteudo||'';
+  rascunhoForm=normalizarFormConfig(reg?.form_config);
+  toggleFormBuilder(!!reg?.eh_formulario);
+  sincronizarCamposBuilderNaTela();
+
   $('leitura').classList.add('hidden');$('edicao').classList.remove('hidden');
   $('acts-leitura').classList.add('hidden');$('acts-edicao').classList.remove('hidden');
 }
+
 function cancelarEdicao(){
   $('edicao').classList.add('hidden');$('leitura').classList.remove('hidden');
   $('acts-edicao').classList.add('hidden');$('acts-leitura').classList.remove('hidden');
   $('upst').textContent='Cole prints com Ctrl+V ou use o ícone de imagem na barra.';
 }
+
 async function enviarArquivo(file){
-  if(!podeEditar())return alert('Permissão Editor ou Admin necessária para enviar mídias.');
+  if(!podeEditarAtual())return alert('Permissão necessária para enviar mídias.');
   $('upst').textContent='Enviando mídia...';
   try{
     const ext=file.name?file.name.split('.').pop().toLowerCase():'png';
@@ -516,8 +2368,9 @@ async function enviarArquivo(file){
     $('upst').textContent='Mídia enviada!';
   }catch(err){console.error(err);$('upst').textContent='Erro ao enviar mídia.';alert('Erro ao enviar: '+err.message)}
 }
+
 function inserirPorLink(){
-  if(!podeEditar())return alert('Permissão Editor ou Admin necessária.');
+  if(!podeEditarAtual())return alert('Permissão necessária.');
   const url=prompt('Cole o link da imagem/GIF ou do vídeo (YouTube / .mp4):');if(!url)return;
   quill.focus();const r=quill.getSelection(true)||{index:quill.getLength()};
   if(/\.(jpe?g|gif|png|webp|svg)(\?.*)?$/i.test(url))quill.insertEmbed(r.index,'image',url,'user');
@@ -529,32 +2382,84 @@ function inserirPorLink(){
   }else quill.insertEmbed(r.index,'image',url,'user');
   quill.setSelection(r.index+1,0,'user');
 }
-async function salvarArtigo(){
-  if(!podeEditar())return alert('Acesso negado.');
-  const n=N.find(x=>x.id===cur);if(!n)return;
+
+function coletarPayloadEdicao(tituloPadrao,existente){
+  const ehForm=$('chk-eh-form').checked;
+  const formConfig={
+    subtitulo:$('fb-subtitulo').value.trim()||'Sistema Integrado de Qualidade e Eficiência Operacional • Manual Normativo 190',
+    headerCor:$('fb-header-cor').value||'#1e3a5f',
+    accentCor:$('fb-accent-cor').value||'#1e3a5f',
+    bgCor:$('fb-bg-cor').value||'#ffffff',
+    formato:$('fb-formato').value||'padrao',
+    itens:rascunhoForm.itens
+  };
+  const quem=user?.email||'editor';
+  return {
+    titulo:existente?.titulo||tituloPadrao,
+    conteudo:quill.root.innerHTML,
+    eh_formulario:ehForm,
+    form_config:formConfig,
+    autor_email:existente?.autor_email||quem,
+    editado_por:quem,
+    updated_at:new Date().toISOString()
+  };
+}
+
+async function salvarAtual(){
+  if(!podeEditarAtual())return alert('Acesso negado.');
+  if(!cur)return;
+  if(cur.kind==='natureza')return salvarArtigoNatureza();
+  return salvarTopico();
+}
+
+async function salvarArtigoNatureza(){
+  const n=N.find(x=>x.id===cur.id);if(!n)return;
   const b=$('btn-salvar');b.disabled=true;b.textContent='Salvando...';
   try{
-    const html=quill.root.innerHTML;
-    if(conteudoVazio(html)){
-      if(n.artigo_id)await excluirArtigo(true);else cancelarEdicao();
+    const atual=artigoDe(n);
+    const payload=coletarPayloadEdicao(n.natureza,atual);
+    if(conteudoVazio(payload.conteudo)&&!payload.eh_formulario){
+      if(n.artigo_id)await excluirArtigoNatureza(true);else cancelarEdicao();
       return;
     }
     if(n.artigo_id){
-      const{error}=await sb.from('ARTIGOS').update({conteudo:html}).eq('id',n.artigo_id);
+      const{error}=await sb.from('ARTIGOS').update(payload).eq('id',n.artigo_id);
       if(error)throw error;
     }else{
-      const{data,error}=await sb.from('ARTIGOS').insert([{titulo:n.natureza,conteudo:html}]).select().single();
+      const{data,error}=await sb.from('ARTIGOS').insert([payload]).select().single();
       if(error)throw error;
       const e2=await sb.from('NATUREZAS').update({artigo_id:data.id}).eq('id',n.id);
       if(e2.error)throw e2.error;
     }
-    await carregarDados();selecionar(n.id,false);cancelarEdicao();
+    formIniciado=false;fichaAtivaId=null;
+    await carregarDados();selecionarNatureza(n.id,false);cancelarEdicao();
   }catch(err){console.error(err);alert('Erro ao salvar: '+err.message)}
   finally{b.disabled=false;b.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Salvar alterações';uiPermissoes()}
 }
-async function excluirArtigo(silencioso=false){
-  if(!podeExcluir()){if(!silencioso)alert('Acesso negado: apenas Admin pode excluir.');return}
-  const n=N.find(x=>x.id===cur);if(!n||!n.artigo_id)return;
+
+async function salvarTopico(){
+  if(!podeCriarTopico())return alert('Acesso negado.');
+  const t=T.find(x=>x.id===cur.id);if(!t)return;
+  const b=$('btn-salvar');b.disabled=true;b.textContent='Salvando...';
+  try{
+    const payload=coletarPayloadEdicao(t.titulo,t);
+    const{error}=await sb.from('TOPICOS_COPOM').update(payload).eq('id',t.id);
+    if(error)throw error;
+    formIniciado=false;fichaAtivaId=null;
+    await carregarDados();selecionarTopico(t.id,false);cancelarEdicao();
+  }catch(err){console.error(err);alert('Erro ao salvar tópico: '+err.message)}
+  finally{b.disabled=false;b.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Salvar alterações';uiPermissoes()}
+}
+
+async function excluirAtual(silencioso=false){
+  if(!cur)return;
+  if(cur.kind==='natureza')return excluirArtigoNatureza(silencioso);
+  return excluirTopico(silencioso);
+}
+
+async function excluirArtigoNatureza(silencioso=false){
+  if(!podeExcluir()){if(!silencioso)alert('Acesso negado: apenas Supervisor, Coordenador, Gerente ou Admin pode excluir.');return}
+  const n=N.find(x=>x.id===cur.id);if(!n||!n.artigo_id)return;
   const qtd=N.filter(x=>x.artigo_id===n.artigo_id).length;
   if(!silencioso&&!confirm(qtd>1?`Este artigo está vinculado a ${qtd} naturezas. Excluir o conteúdo de TODAS?`:'Tem certeza que deseja excluir o conteúdo desta natureza?'))return;
   try{
@@ -563,15 +2468,27 @@ async function excluirArtigo(silencioso=false){
     if(e1.error)throw e1.error;
     const e2=await sb.from('ARTIGOS').delete().eq('id',id);
     if(e2.error)throw e2.error;
-    await carregarDados();selecionar(n.id,false);cancelarEdicao();
+    formIniciado=false;fichaAtivaId=null;
+    await carregarDados();selecionarNatureza(n.id,false);cancelarEdicao();
   }catch(err){console.error(err);if(!silencioso)alert('Erro ao excluir: '+err.message)}
   finally{uiPermissoes()}
 }
 
-/* ===== Vínculos ===== */
+async function excluirTopico(silencioso=false){
+  if(!podeExcluir()){if(!silencioso)alert('Acesso negado: apenas Supervisor, Coordenador, Gerente ou Admin pode excluir.');return}
+  const t=T.find(x=>x.id===cur.id);if(!t)return;
+  if(!silencioso&&!confirm(`Tem certeza que deseja excluir permanentemente o tópico "${t.titulo}"?`))return;
+  try{
+    const{error}=await sb.from('TOPICOS_COPOM').delete().eq('id',t.id);
+    if(error)throw error;
+    await carregarDados();voltarInicio();
+  }catch(err){console.error(err);if(!silencioso)alert('Erro ao excluir tópico: '+err.message)}
+  finally{uiPermissoes()}
+}
+
 function abrirVinculos(){
-  if(!podeEditar())return alert('Acesso negado: apenas Editor ou Admin.');
-  const n=N.find(x=>x.id===cur);if(!n)return;
+  if(!podeEditarAtual()||cur?.kind!=='natureza')return alert('Acesso negado.');
+  const n=N.find(x=>x.id===cur.id);if(!n)return;
   $('v-ref').innerHTML='';
   const s=document.createElement('b');s.textContent=`${n.id} - ${n.natureza}`;
   $('v-ref').append('Natureza de referência: ',s);
@@ -598,27 +2515,31 @@ function listaVinculos(f){
 }
 $('v-busca').addEventListener('input',e=>listaVinculos(e.target.value));
 async function salvarVinculos(){
-  if(!podeEditar())return alert('Acesso negado.');
-  const n=N.find(x=>x.id===cur);if(!n)return;
+  if(!podeEditarAtual()||cur?.kind!=='natureza')return alert('Acesso negado.');
+  const n=N.find(x=>x.id===cur.id);if(!n)return;
   sel.add(n.id);
   const b=$('v-salvar');b.disabled=true;b.textContent='Vinculando...';
   try{
+    const quem=user?.email||'editor';
     let mestre=n.artigo_id;
     if(!mestre)for(const id of sel){const x=N.find(y=>y.id===id);if(x?.artigo_id){mestre=x.artigo_id;break}}
     if(!mestre){
-      const{data,error}=await sb.from('ARTIGOS').insert([{titulo:n.natureza,conteudo:''}]).select().single();
+      const{data,error}=await sb.from('ARTIGOS').insert([{titulo:n.natureza,conteudo:'',autor_email:quem,editado_por:quem}]).select().single();
       if(error)throw error;mestre=data.id;
     }
     const e1=await sb.from('NATUREZAS').update({artigo_id:mestre}).in('id',[...sel]);
     if(e1.error)throw e1.error;
     const saiu=N.filter(x=>x.artigo_id===mestre&&!sel.has(x.id)).map(x=>x.id);
     if(saiu.length){const e2=await sb.from('NATUREZAS').update({artigo_id:null}).in('id',saiu);if(e2.error)throw e2.error}
-    fecharVinculos();await carregarDados();selecionar(n.id,false);
+    fecharVinculos();await carregarDados();selecionarNatureza(n.id,false);
   }catch(err){console.error(err);alert('Erro ao vincular: '+err.message)}
   finally{b.disabled=false;b.textContent='Salvar vínculos'}
 }
 
-/* ===== Init ===== */
+function escapeHtml(str){
+  return String(str||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
 sb.auth.onAuthStateChange((_e,s)=>{carregarPapel(s?.user||null)});
 (async()=>{
   const{data}=await sb.auth.getSession();
