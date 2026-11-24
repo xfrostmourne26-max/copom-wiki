@@ -274,6 +274,19 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
 .fxstrip input[type=color]{width:20px;height:20px;padding:0;border:1px solid var(--line);background:none;cursor:pointer}
 @media(max-width:1150px){.wrap{grid-template-columns:200px minmax(0,1fr)}.rail{grid-column:1/-1;padding:0 22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}.rail .box{margin:0}main{border-right:0}}
 @media(max-width:760px){.wrap{display:block}.side{position:static;max-height:none}main{padding:18px;border-width:1px 0}.rail{display:block;padding:16px}.rail .box{margin-bottom:12px}header{padding:10px 14px}}
+
+/* ===== ajustes: tela larga e busca branca ===== */
+.wrap{grid-template-columns:clamp(240px,15vw,300px) minmax(0,1fr) clamp(300px,19vw,380px);max-width:none;padding:0 clamp(8px,1.5vw,28px) 40px}
+.art.ql-editor{max-width:min(118ch,100%)}
+.central-panel{max-width:min(1560px,100%)}
+.form-start-card{max-width:min(1100px,100%)}
+.hero p{max-width:min(1000px,100%)}
+.recent{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.search{max-width:760px}
+#res,:root[data-theme=dark] #res{background:#fff!important;color:#1e293b!important;border:1px solid #a2a9b1!important;box-shadow:0 12px 28px rgba(0,0,0,.28)!important}
+.res-item,:root[data-theme=dark] .res-item{background:#fff!important;color:#1e293b!important;border-bottom:1px solid #e2e8f0!important}
+.res-item:hover,.res-item:focus-visible,:root[data-theme=dark] .res-item:hover,:root[data-theme=dark] .res-item:focus-visible{background:#eaf3ff!important;outline:1px solid #a2c4f0!important}
+.res-badge,:root[data-theme=dark] .res-badge{background:#f8f9fa!important;color:#475569!important;border-color:#cbd5e1!important}
 </style>
 </head>
 <body>
@@ -344,9 +357,9 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
   <main>
     <section id="home" class="hero">
       <p class="muted" style="padding:0;text-transform:uppercase;letter-spacing:.08em;font-weight:700">Copom-Wiki</p>
-      <h1>Base de naturezas, tópicos e formulários</h1>
+      <h1>Base de naturezas, tópicos e qualidade</h1>
       <p>Consulte padrões operacionais, fichas/formulários do COPOM e orientações por código ou nome da natureza. Use a busca no topo por palavras-chave, títulos de formulários ou trechos de texto.</p>
-      <h2 class="sec"><i class="fa-solid fa-clock-rotate-left"></i> Últimos complementos e tópicos</h2>
+      <h2 class="sec"><i class="fa-solid fa-clock-rotate-left"></i> Últimos Alinhamentos e Tópicos</h2>
       <ul id="recentes" class="recent"></ul>
     </section>
 
@@ -416,8 +429,9 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
 
             <div class="syntax-help">
               <b>Como funciona a nota e a permissão:</b><br>
-              • Qualidade ou superior define o valor de cada opção na hora (ex.: <code>10</code>, <code>5</code>, <code>0</code>). Opções com valor <code>0</code> não entram na média.<br>
-              • Ao salvar/enviar, o sistema calcula a <b>média das opções marcadas com valor &gt; 0.1</b> e exibe para o usuário destinatário.<br>
+              • Cada pergunta pontua de um de dois jeitos: <b>Certo/errado</b> (entra na média de 0 a 10; a opção marcada vale a fração do maior valor e <code>N/A</code> é ignorada) ou <b>Lista de compra</b> (soma o valor de cada opção marcada; ex.: 3 opções de <code>1</code> ponto, marcando as 3 = 3 pontos).<br>
+              • Só lista de compra: nota = total de pontos (ex.: 3 de 3). Só certo/errado: média de 0 a 10. Misturando os dois: nota de 0 a 10, onde cada pergunta certo/errado vale 1 ponto.<br>
+              • Qualidade ou superior pode ajustar o valor de cada opção na ficha. Opções com valor <code>0</code> não somam pontos.<br>
               • Usuários de <b>qualidade para cima</b> podem editar e excluir formulários e fichas de qualquer pessoa (inclusive criadas por <code>admin</code>).
             </div>
 
@@ -425,7 +439,7 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
               <b>Adicionar item ao formulário</b>
               <div class="builder-grid">
                 <label class="field">Tipo de item
-                  <select id="fb-tipo" onchange="ajustarCamposConstrutor()">
+                  <select id="fb-tipo" onchange="definirCalculoPadraoDoTipo();ajustarCamposConstrutor()">
                     <option value="alinhamento">Alinhamento / Critério (com opções e notas)</option>
                     <option value="linha_mista">Linha mista (texto + [campo] + [linha] + [x:Opção])</option>
                     <option value="fechamento_alinhamento">Fechamento / Alinhamento final</option>
@@ -451,6 +465,13 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
                   <select id="fb-check-esq">
                     <option value="nao">Não</option>
                     <option value="sim">Sim</option>
+                  </select>
+                </label>
+                <label class="field" id="wrap-fb-calculo">Como esta pergunta pontua
+                  <select id="fb-calculo" onchange="ajustarCamposConstrutor()">
+                    <option value="media">Certo/errado (entra na média 0–10)</option>
+                    <option value="soma">Lista de compra (soma os pontos marcados)</option>
+                    <option value="nenhum">Não pontua</option>
                   </select>
                 </label>
                 <label class="field" id="wrap-fb-rotulo" style="grid-column:1/-1">Título / Descrição do alinhamento ou linha
@@ -565,10 +586,10 @@ const sb=supabase.createClient(SB_URL,SB_KEY);
 const $=id=>document.getElementById(id);
 const norm=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 
-// Qualidade para cima tem permissão total para editar e excluir qualquer artigo/tópico/formulário/ficha (inclusive de admin)
 const CARGOS_QUALIDADE_E_ACIMA=['qualidade','supervisor','coordenador','gerente','admin'];
-const CARGOS_ARTIGO_NATUREZA=['editor','qualidade','supervisor','coordenador','gerente','admin'];
-const CARGOS_TOPICO_COPOM=['editor','qualidade','supervisor','coordenador','gerente','admin'];
+const CARGOS_EDITORES=['editor','qualidade','supervisor','coordenador','gerente','admin'];
+const CARGOS_ARTIGO_NATUREZA=CARGOS_EDITORES;
+const CARGOS_TOPICO_COPOM=CARGOS_EDITORES;
 
 let N=[],A=[],T=[],FICHAS=[];
 let cur=null,quill=null,user=null,role=null,modo='login',sel=new Set(),size=17;
@@ -583,7 +604,7 @@ let rascunhoForm={
 };
 
 const ehQualidadeOuGestao=()=>!!role&&CARGOS_QUALIDADE_E_ACIMA.includes(role);
-const podeGerirFormularios=()=>!!role&&['editor','qualidade','supervisor','coordenador','gerente','admin'].includes(role);
+const podeGerirFormularios=()=>!!role&&CARGOS_EDITORES.includes(role);
 const ehUsuarioComum=()=>!!user&&role==='user';
 
 function podeEditarAtual(){
@@ -794,7 +815,7 @@ function parseNumeroFlex(val){
   const m=String(val||'').replace(',','.').match(/-?\d+(\.\d+)?/);
   return m?parseFloat(m[0]):0;
 }
-function parseOpcaoComValor(rawStr,defaultVal=0){
+function parseOpcaoComValor(rawStr,defaultVal=0,regraNaoNA=true){
   const s=String(rawStr||'').trim();
   const idxEq=s.lastIndexOf('=');
   if(idxEq>-1){
@@ -806,8 +827,10 @@ function parseOpcaoComValor(rawStr,defaultVal=0){
       valor:isFinite(parsed)?parsed:defaultVal
     };
   }
-  const n=norm(s);
-  if(n==='n/a'||n==='na'||n==='nao aplicavel'||n==='nao')return {label:s,valor:0};
+  if(regraNaoNA){
+    const n=norm(s);
+    if(n==='n/a'||n==='na'||n==='nao aplicavel'||n==='nao')return {label:s,valor:0};
+  }
   return {label:s,valor:defaultVal};
 }
 function quemPreencheEfetivo(chave,item){
@@ -841,6 +864,33 @@ function criarSeletorPermissaoItem(chave,item,isGestor){
   };
   return selEl;
 }
+
+const CALCULOS_VALIDOS=['media','soma','nenhum'];
+function calculoPadraoDoTipo(tipo){
+  if(tipo==='x_multipla')return 'soma';
+  if(tipo==='alinhamento'||tipo==='x_unica')return 'media';
+  return 'nenhum';
+}
+function valorPadraoOpcao(calculo,opIdx){
+  if(calculo==='soma')return 1;
+  if(calculo==='media')return opIdx===0?10:0;
+  return 0;
+}
+function opcaoEhNaoAplicavel(label){
+  const n=norm(label);
+  return n==='n/a'||n==='na'||n==='n.a.'||n==='nao aplicavel'||n==='nao se aplica';
+}
+function textoValorOpcao(v){
+  const r=Math.round((v+Number.EPSILON)*100)/100;
+  return v>0?`vale ${r}`:'vale 0';
+}
+function formatarNotaFicha(resp){
+  const n=resp?._notaFinal;
+  if(n===undefined||n===null||n==='')return '';
+  const max=Number(resp?._notaMaxima);
+  return(isFinite(max)&&max>0&&max!==10)?`${n}/${max}`:String(n);
+}
+
 function normalizarFormConfig(raw){
   const cfg=(raw&&typeof raw==='object')?raw:{};
   return {
@@ -851,17 +901,22 @@ function normalizarFormConfig(raw){
     formato:cfg.formato||'padrao',
     itens:Array.isArray(cfg.itens)?cfg.itens.map(x=>{
       const opsRaw=Array.isArray(x.opcoes)?x.opcoes:[];
-      const opsParsed=opsRaw.map((o,i)=>{
-        const def=i===0?10:0;
-        return parseOpcaoComValor(o,def);
+      const calculo=CALCULOS_VALIDOS.includes(x.calculo)?x.calculo:calculoPadraoDoTipo(x.tipo);
+      const opsParsed=opsRaw.map((o,i)=>parseOpcaoComValor(o,valorPadraoOpcao(calculo,i),calculo!=='soma'));
+      const salvos=Array.isArray(x.valoresOpcoes)?x.valoresOpcoes:[];
+      const valoresFinais=opsParsed.map((p,i)=>{
+        if(String(opsRaw[i]??'').includes('='))return p.valor;
+        const sv=salvos[i];
+        return(typeof sv==='number'&&isFinite(sv))?sv:p.valor;
       });
       return {
         ...x,
+        calculo,
         quemPreenche:x.quemPreenche==='usuario'?'usuario':'qualidade',
         checkEsq:!!x.checkEsq,
         detalhe:x.detalhe||'',
         opcoes:opsParsed.map(p=>p.label),
-        valoresOpcoes:opsParsed.map(p=>p.valor)
+        valoresOpcoes:valoresFinais
       };
     }):[]
   };
@@ -1162,7 +1217,7 @@ function abrirCentralFichas(){
                 <div>
                   <b>${escapeHtml(fc.titulo_formulario||'Formulário')}</b> ·
                   <span class="status-pill ${stClass}">${escapeHtml(rotuloStatusFicha(fc.status))}</span>
-                  ${(nota!==undefined&&nota!==null&&nota!=='')?` · <b>Média: ${escapeHtml(String(nota))}</b>`:''}
+                  ${(nota!==undefined&&nota!==null&&nota!=='')?` · <b>Nota: ${escapeHtml(formatarNotaFicha(fc.respostas))}</b>`:''}
                   ${contest?` <span class="contest-flag"><i class="fa-solid fa-scale-balanced"></i> Contestada</span>`:''}
                   ${visto?` <span class="visto-flag"><i class="fa-solid fa-check"></i> Visto em ${escapeHtml(dataCurta(visto.data)||'')}</span>`:''}
                   <div class="muted" style="padding:3px 0 0">Avaliador: ${escapeHtml(fc.avaliador_email||'—')} · Atualizado: ${escapeHtml(dataCurta(fc.updated_at||fc.created_at)||'—')}</div>
@@ -1242,7 +1297,7 @@ function abrirCentralFichas(){
         <tbody>
           ${FICHAS.length?FICHAS.map(fc=>{
             const nota=(fc.respostas?._notaFinal!==undefined&&fc.respostas?._notaFinal!==null&&fc.respostas?._notaFinal!=='')
-              ?`<b>${escapeHtml(String(fc.respostas._notaFinal))}</b>`:'<span class="muted">—</span>';
+              ?`<b>${escapeHtml(formatarNotaFicha(fc.respostas))}</b>`:'<span class="muted">—</span>';
             const contest=(fc.respostas?._contestacao||'').trim();
             const visto=fc.respostas?._vistoUsuario;
             const stClass=['finalizada','enviada','contestada','reajustada'].includes(fc.status)?fc.status:'';
@@ -1360,7 +1415,7 @@ function renderizarVisualizacao(tituloStr,registro){
           const stClass=['finalizada','enviada','contestada','reajustada'].includes(fc.status)?fc.status:'';
           const stLabel=rotuloStatusFicha(fc.status);
           const notaExibida=(fc.respostas&&fc.respostas._notaFinal!==undefined&&fc.respostas?._notaFinal!==null&&fc.respostas?._notaFinal!=='')
-            ?` · Média: <b>${escapeHtml(String(fc.respostas._notaFinal))}</b>`:'';
+            ?` · Nota: <b>${escapeHtml(formatarNotaFicha(fc.respostas))}</b>`:'';
           const contestResumo=(fc.respostas&&fc.respostas._contestacao)
             ?`<div class="muted" style="padding:2px 0 0;color:#b91c1b;font-weight:600"><i class="fa-solid fa-scale-balanced"></i> Contestação: ${escapeHtml(fc.respostas._contestacao)}</div>`:'';
           const vistoResumo=(fc.respostas&&fc.respostas._vistoUsuario)
@@ -1458,6 +1513,7 @@ function abrirFichaExistente(id){
     _contestacao:(fc.respostas&&fc.respostas._contestacao)||'',
     _vistoUsuario:(fc.respostas&&fc.respostas._vistoUsuario)||null,
     _notaFinal:(fc.respostas&&fc.respostas._notaFinal!==undefined)?fc.respostas._notaFinal:'',
+    _notaMaxima:(fc.respostas&&fc.respostas._notaMaxima!==undefined)?fc.respostas._notaMaxima:10,
     _permissoesItens:(fc.respostas&&typeof fc.respostas._permissoesItens==='object'&&fc.respostas._permissoesItens)||{...((fc.respostas&&fc.respostas._permissoesItens)||{})},
     _valoresOpcoes:(fc.respostas&&typeof fc.respostas._valoresOpcoes==='object'&&fc.respostas._valoresOpcoes)||{...((fc.respostas&&fc.respostas._valoresOpcoes)||{})}
   };
@@ -1592,56 +1648,100 @@ function salvarValorOpcao(chaveItem,opIdx,valor){
 
 function calcularMediaOpcoesMarcadas(){
   const runner=$('form-runner');
-  if(!runner)return {media:0,qtd:0,soma:0};
+  if(!runner)return {media:0,qtd:0,soma:0,maximo:10,pontos:0,pontosMax:0};
 
-  const valoresConsiderados=[];
+  const r2=n=>Math.round((n+Number.EPSILON)*100)/100;
+  let pontos=0,pontosMax=0,qtdSoma=0;
+  let somaFracoes=0,qtdMedia=0,qtdPendentes=0;
 
   runner.querySelectorAll('[data-pontuavel="1"]').forEach(grupo=>{
+    const calculo=grupo.dataset.calculo==='soma'?'soma':'media';
     const chaveItem=grupo.dataset.qKey;
-    grupo.querySelectorAll('.opt-item-wrap').forEach((wrap,opIdx)=>{
+    const wraps=[...grupo.querySelectorAll('.opt-item-wrap')];
+    if(!wraps.length)return;
+
+    const itens=wraps.map((wrap,opIdx)=>{
       const inp=wrap.querySelector('input[type="radio"],input[type="checkbox"]');
       const valInp=wrap.querySelector('.opt-val-inp');
+      const bruto=valInp?parseNumeroFlex(valInp.value):obterValorOpcao(chaveItem,opIdx,0);
+      const v=(isFinite(bruto)&&bruto>0)?bruto:0;
       const badge=wrap.querySelector('.opt-val-badge');
-      const v=valInp?parseNumeroFlex(valInp.value):obterValorOpcao(chaveItem,opIdx,0);
-
       if(badge){
-        const conta=v>0.1;
-        badge.textContent=conta?`nota ${v}`:`0 (ign.)`;
-        badge.classList.toggle('active-val',conta);
+        badge.textContent=textoValorOpcao(v);
+        badge.classList.toggle('active-val',v>0);
       }
-
-      if(inp&&inp.checked&&v>0.1){
-        valoresConsiderados.push(v);
-      }
+      return {v,marcada:!!(inp&&inp.checked),na:opcaoEhNaoAplicavel(inp?inp.value:'')};
     });
+
+    const positivos=itens.map(i=>i.v).filter(v=>v>0);
+    if(!positivos.length)return;
+
+    const multipla=!!grupo.querySelector('input[type="checkbox"]');
+    const maxPossivel=multipla?positivos.reduce((a,b)=>a+b,0):Math.max(...positivos);
+    const marcadas=itens.filter(i=>i.marcada);
+    const obtido=marcadas.reduce((a,i)=>a+i.v,0);
+
+    if(calculo==='soma'){
+      qtdSoma++;
+      pontosMax+=maxPossivel;
+      pontos+=Math.min(obtido,maxPossivel);
+    }else{
+      if(!marcadas.length){qtdPendentes++;return}
+      if(!marcadas.some(i=>!i.na))return;
+      qtdMedia++;
+      somaFracoes+=Math.min(1,obtido/maxPossivel);
+    }
   });
 
-  const qtd=valoresConsiderados.length;
-  const soma=valoresConsiderados.reduce((acc,n)=>acc+n,0);
-  const media=qtd>0?Number((soma/qtd).toFixed(2)):0;
+  let nota=0,maximo=10,detalhe='';
+  if(qtdSoma>0&&qtdMedia===0){
+    nota=r2(pontos);maximo=r2(pontosMax);
+    detalhe=`${nota} de ${maximo} pontos (soma das opções marcadas)`;
+  }else if(qtdSoma===0&&qtdMedia>0){
+    nota=r2((somaFracoes/qtdMedia)*10);
+    detalhe=`${qtdMedia} ${qtdMedia===1?'pergunta avaliada':'perguntas avaliadas'} (certo/errado) → média ${nota} de 10`;
+  }else if(qtdSoma>0&&qtdMedia>0){
+    const total=pontosMax+qtdMedia;
+    nota=r2(((pontos+somaFracoes)/total)*10);
+    detalhe=`${r2(pontos+somaFracoes)} de ${r2(total)} pontos possíveis (cada pergunta certo/errado vale 1) → nota ${nota} de 10`;
+  }else{
+    detalhe='Nenhuma pergunta com valor foi marcada ainda';
+  }
+  if(qtdPendentes>0&&(qtdSoma+qtdMedia)>0)detalhe+=` · ${qtdPendentes} sem resposta`;
 
   const notaInp=$('fc-nota-final');
   const detEl=$('fc-pts-detalhe');
   const bar=$('score-summary-bar');
-
-  if(notaInp){
-    notaInp.value=String(media);
-  }
-  respostasRascunho._notaFinal=media;
-
-  if(detEl){
-    detEl.textContent=qtd>0
-      ?`Média de ${qtd} ${qtd===1?'opção (> 0.1)':'opções (> 0.1)'}: soma ${soma} ÷ ${qtd} = ${media}`
-      :`Nenhuma opção com valor > 0.1 marcada (valor 0 não entra na média)`;
-  }
+  if(notaInp)notaInp.value=String(nota);
+  respostasRascunho._notaFinal=nota;
+  respostasRascunho._notaMaxima=maximo;
+  if(detEl)detEl.textContent=detalhe;
   if(bar){
-    bar.classList.toggle('zero-alert',qtd===0||media===0);
+    const ratio=maximo>0?nota/maximo:0;
+    bar.classList.toggle('zero-alert',(qtdSoma+qtdMedia)===0||ratio<0.5);
   }
 
-  return {media,qtd,soma};
+  return {media:nota,qtd:qtdSoma+qtdMedia,soma:nota,maximo,pontos:r2(pontos),pontosMax:r2(pontosMax)};
 }
 
-function criarControleOpcaoPontuavel(chaveItem,opIdx,labelOp,valorPadrao,inputType,groupName,marcada,podePreencher,ehQualidadePlus){
+function atualizarBadgesSemRecalcularNota(){
+  const runner=$('form-runner');
+  if(!runner)return;
+  runner.querySelectorAll('[data-pontuavel="1"]').forEach(grupo=>{
+    const chaveItem=grupo.dataset.qKey;
+    grupo.querySelectorAll('.opt-item-wrap').forEach((wrap,opIdx)=>{
+      const valInp=wrap.querySelector('.opt-val-inp');
+      const v=valInp?parseNumeroFlex(valInp.value):obterValorOpcao(chaveItem,opIdx,0);
+      const badge=wrap.querySelector('.opt-val-badge');
+      if(badge){
+        badge.textContent=textoValorOpcao(v>0?v:0);
+        badge.classList.toggle('active-val',(v>0));
+      }
+    });
+  });
+}
+
+function criarControleOpcaoPontuavel(chaveItem,opIdx,labelOp,valorPadrao,inputType,groupName,marcada,podePreencher,ehQualidadePlus,calculo){
   const wrap=document.createElement('span');
   wrap.className='opt-item-wrap';
   wrap.style.cssText='display:inline-flex;align-items:center;gap:4px';
@@ -1667,6 +1767,8 @@ function criarControleOpcaoPontuavel(chaveItem,opIdx,labelOp,valorPadrao,inputTy
   choice.append(input,box,txt);
   wrap.append(choice);
 
+  if(calculo==='nenhum')return wrap;
+
   const valAtual=obterValorOpcao(chaveItem,opIdx,valorPadrao);
   salvarValorOpcao(chaveItem,opIdx,valAtual);
 
@@ -1674,8 +1776,9 @@ function criarControleOpcaoPontuavel(chaveItem,opIdx,labelOp,valorPadrao,inputTy
     const valInp=document.createElement('input');
     valInp.type='number';
     valInp.step='0.1';
+    valInp.min='0';
     valInp.className='opt-val-inp';
-    valInp.title='Valor desta opção (0 não entra na média; calcula média de valores > 0.1)';
+    valInp.title='Pontos desta opção (0 = não soma pontos)';
     valInp.value=String(valAtual);
     valInp.oninput=()=>{
       salvarValorOpcao(chaveItem,opIdx,valInp.value);
@@ -1684,8 +1787,8 @@ function criarControleOpcaoPontuavel(chaveItem,opIdx,labelOp,valorPadrao,inputTy
     wrap.append(valInp);
   }else{
     const badge=document.createElement('span');
-    badge.className='opt-val-badge'+(valAtual>0.1?' active-val':'');
-    badge.textContent=valAtual>0.1?`nota ${valAtual}`:'0 (ign.)';
+    badge.className='opt-val-badge'+(valAtual>0?' active-val':'');
+    badge.textContent=textoValorOpcao(valAtual);
     wrap.append(badge);
   }
 
@@ -1735,16 +1838,16 @@ function montarFormularioInterativo(tituloStr,cfg,htmlExtra){
   }
   sheet.append(assignBar);
 
+  const temNotaSalva=respostasRascunho._notaFinal!==undefined&&respostasRascunho._notaFinal!==null&&respostasRascunho._notaFinal!=='';
   const scoreBar=document.createElement('div');
   scoreBar.className='score-summary-bar';
   scoreBar.id='score-summary-bar';
-  const notaInicial=(respostasRascunho._notaFinal!==undefined&&respostasRascunho._notaFinal!==null&&respostasRascunho._notaFinal!=='')
-    ?respostasRascunho._notaFinal:'0';
+  const notaInicial=temNotaSalva?respostasRascunho._notaFinal:'0';
   scoreBar.innerHTML=`
     <div>
-      <b>Média das opções (&gt; 0.1):</b>
+      <b>Nota:</b>
       <input type="text" readonly class="score-num-input" id="fc-nota-final" value="${escapeHtml(String(notaInicial))}">
-      <span class="muted" id="fc-pts-detalhe" style="padding:0 0 0 8px"></span>
+      <span class="muted" id="fc-pts-detalhe" style="padding:0 0 0 8px">${temNotaSalva?'Nota registrada na ficha':'Alterações recalculam a nota automaticamente'}</span>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap">
       ${!isGestor?`
@@ -1904,7 +2007,8 @@ function montarFormularioInterativo(tituloStr,cfg,htmlExtra){
           box.className='align-box';
           box.dataset.qKey=chave;
           box.dataset.qTipo='alinhamento';
-          box.dataset.pontuavel='1';
+          if(item.calculo!=='nenhum')box.dataset.pontuavel='1';
+          box.dataset.calculo=item.calculo||'media';
 
           const desc=document.createElement('div');
           desc.className='align-desc';
@@ -1918,9 +2022,9 @@ function montarFormularioInterativo(tituloStr,cfg,htmlExtra){
           const valsPadrao=Array.isArray(item.valoresOpcoes)?item.valoresOpcoes:[];
 
           opcoes.forEach((op,opIdx)=>{
-            const defVal=valsPadrao[opIdx]!==undefined?valsPadrao[opIdx]:(opIdx===0?10:0);
+            const defVal=valsPadrao[opIdx]!==undefined?valsPadrao[opIdx]:valorPadraoOpcao(item.calculo,opIdx);
             const optCtrl=criarControleOpcaoPontuavel(
-              chave,opIdx,op,defVal,'radio',groupName,marcadas.includes(op),podePreencherCampo,ehQualPlus
+              chave,opIdx,op,defVal,'radio',groupName,marcadas.includes(op),podePreencherCampo,ehQualPlus,item.calculo
             );
             ctrls.append(optCtrl);
           });
@@ -2044,7 +2148,8 @@ function montarFormularioInterativo(tituloStr,cfg,htmlExtra){
             optsDiv.className='form-opts';
             optsDiv.dataset.qKey=chave;
             optsDiv.dataset.qTipo=item.tipo;
-            optsDiv.dataset.pontuavel='1';
+            if(item.calculo!=='nenhum')optsDiv.dataset.pontuavel='1';
+            optsDiv.dataset.calculo=item.calculo||'soma';
             const marcadas=Array.isArray(salvo)?salvo:(Array.isArray(salvo?.marcadas)?salvo.marcadas:[]);
             const groupName=`grp_${item._idx}_${Math.random().toString(36).slice(2,7)}`;
             const opcoes=(item.opcoes&&item.opcoes.length)?item.opcoes:['Sim','Não'];
@@ -2052,9 +2157,9 @@ function montarFormularioInterativo(tituloStr,cfg,htmlExtra){
             const inputType=item.tipo==='x_unica'?'radio':'checkbox';
 
             opcoes.forEach((op,opIdx)=>{
-              const defVal=valsPadrao[opIdx]!==undefined?valsPadrao[opIdx]:(opIdx===0?10:0);
+              const defVal=valsPadrao[opIdx]!==undefined?valsPadrao[opIdx]:valorPadraoOpcao(item.calculo,opIdx);
               const optCtrl=criarControleOpcaoPontuavel(
-                chave,opIdx,op,defVal,inputType,item.tipo==='x_unica'?groupName:'',marcadas.includes(op),podePreencherCampo,ehQualPlus
+                chave,opIdx,op,defVal,inputType,item.tipo==='x_unica'?groupName:'',marcadas.includes(op),podePreencherCampo,ehQualPlus,item.calculo
               );
               optsDiv.append(optCtrl);
             });
@@ -2177,8 +2282,21 @@ function montarFormularioInterativo(tituloStr,cfg,htmlExtra){
   sheet.append(bar);
   runner.append(sheet);
 
-  runner.addEventListener('change',()=>calcularMediaOpcoesMarcadas());
-  calcularMediaOpcoesMarcadas();
+  runner.onchange=e=>{
+    if(e.target&&e.target.closest('[data-pontuavel="1"]')){
+      calcularMediaOpcoesMarcadas();
+    }
+  };
+  if(temNotaSalva){
+    atualizarBadgesSemRecalcularNota();
+    const max=Number(respostasRascunho._notaMaxima);
+    if(isFinite(max)&&max>0&&max!==10){
+      const detEl=$('fc-pts-detalhe');
+      if(detEl)detEl.textContent=`Nota registrada: ${respostasRascunho._notaFinal} de ${max}`;
+    }
+  }else{
+    calcularMediaOpcoesMarcadas();
+  }
 }
 
 function focarContestacao(){
@@ -2266,6 +2384,7 @@ async function persistirFicha(novoStatus){
     _contestacao:contestAtual,
     _vistoUsuario:respostasRascunho._vistoUsuario||null,
     _notaFinal:calc.media,
+    _notaMaxima:calc.maximo,
     _qtdOpcoesMedia:calc.qtd,
     _permissoesItens:{...(respostasRascunho._permissoesItens||{})},
     _valoresOpcoes:{...(respostasRascunho._valoresOpcoes||{})}
@@ -2300,7 +2419,7 @@ async function persistirFicha(novoStatus){
       $('fc-status-label').textContent=rotuloStatusFicha(novoStatus).toUpperCase();
       $('fc-status-label').className=`status-pill ${novoStatus}`;
     }
-    alert(`Ficha salva como "${rotuloStatusFicha(novoStatus)}"! Média (> 0.1): ${calc.media}`);
+    alert(`Ficha salva como "${rotuloStatusFicha(novoStatus)}"! Nota: ${formatarNotaFicha(respostas)}`);
   }catch(err){
     console.error(err);
     alert('Erro ao salvar ficha: '+err.message);
@@ -2518,8 +2637,21 @@ function toggleFormBuilder(ativo){
   if(ativo)renderBuilderItens();
 }
 
+function definirCalculoPadraoDoTipo(){
+  const tipo=$('fb-tipo').value;
+  if(['alinhamento','x_unica','x_multipla'].includes(tipo))$('fb-calculo').value=calculoPadraoDoTipo(tipo);
+}
+
 function ajustarCamposConstrutor(){
   const tipo=$('fb-tipo').value;
+  const pontuavel=['alinhamento','x_unica','x_multipla'].includes(tipo);
+  $('wrap-fb-calculo').classList.toggle('hidden',!pontuavel);
+  const opInp=$('fb-opcoes');
+  const PAD_MEDIA='Sim=10, Não=0, N/A=0',PAD_SOMA='Item A=1, Item B=1, Item C=1';
+  const calcSel=$('fb-calculo').value;
+  if(pontuavel&&calcSel==='soma'&&opInp.value===PAD_MEDIA)opInp.value=PAD_SOMA;
+  if(pontuavel&&calcSel!=='soma'&&opInp.value===PAD_SOMA)opInp.value=PAD_MEDIA;
+  opInp.placeholder=calcSel==='soma'?'Ex.: Falou o endereço=1, Confirmou o telefone=1, Informou o protocolo=1':'Ex.: Sim=10, Parcial=5, Não=0, N/A=0';
   $('wrap-fb-opcoes').classList.toggle('hidden',tipo!=='x_unica'&&tipo!=='x_multipla'&&tipo!=='alinhamento'&&tipo!=='fechamento_alinhamento');
   $('wrap-fb-colunas').classList.toggle('hidden',tipo!=='tabela');
   $('wrap-fb-assinaturas').classList.toggle('hidden',tipo!=='assinaturas');
@@ -2546,13 +2678,16 @@ function adicionarItemFormulario(){
   if(tipo!=='tabela'&&tipo!=='assinaturas'&&!rotulo)return alert('Informe o título/descrição do item.');
 
   const opcoesRaw=$('fb-opcoes').value.split(',').map(s=>s.trim()).filter(Boolean);
-  const parsedOps=opcoesRaw.map((o,i)=>parseOpcaoComValor(o,i===0?10:0));
+  const calculo=['alinhamento','x_unica','x_multipla'].includes(tipo)?$('fb-calculo').value:'nenhum';
+  const parsedOps=opcoesRaw.map((o,i)=>parseOpcaoComValor(o,valorPadraoOpcao(calculo,i),calculo!=='soma'));
+  const opcoesPadrao=calculo==='soma'?['Item A','Item B','Item C']:['Sim','Não','N/A'];
+  const valoresPadrao=calculo==='soma'?[1,1,1]:[10,0,0];
   const opcoes=(tipo==='fechamento_alinhamento')
     ?parsedOps.map(p=>p.label)
-    :(parsedOps.length?parsedOps.map(p=>p.label):['Sim','Não','N/A']);
+    :(parsedOps.length?parsedOps.map(p=>p.label):opcoesPadrao);
   const valoresOpcoes=(tipo==='fechamento_alinhamento')
     ?parsedOps.map(p=>p.valor)
-    :(parsedOps.length?parsedOps.map(p=>p.valor):[10,0,0]);
+    :(parsedOps.length?parsedOps.map(p=>p.valor):valoresPadrao);
 
   const colunas=$('fb-colunas').value.split(',').map(s=>s.trim()).filter(Boolean);
   const assinaturas=$('fb-assinaturas').value.split('|').map(s=>s.trim()).filter(Boolean);
@@ -2564,6 +2699,7 @@ function adicionarItemFormulario(){
     secao,
     rotulo:rotulo||(tipo==='tabela'?'Histórico':(tipo==='assinaturas'?'Assinaturas':'Item')),
     detalhe,
+    calculo,
     opcoes,
     valoresOpcoes,
     colunas:colunas.length?colunas:['Data','Protocolo CAD','Duração','Nota Final','Principal Ponto Observado'],
@@ -2605,7 +2741,12 @@ function renderBuilderItens(){
     const permLabel=it.quemPreenche==='usuario'?'Usuário':'Admin';
     const prefixo=it.tipo==='grade_topo'?'[Grade Topo]':(it.tipo==='assinaturas'?'[Assinaturas]':`[${it.secao}]`);
     const desc=it.tipo==='assinaturas'?(it.assinaturas||[]).join(' | '):it.rotulo;
-    div.innerHTML=`<div><b>${escapeHtml(prefixo)}</b> ${escapeHtml(desc)} <small class="muted">(${tipoLabel} · ${permLabel})</small></div>`;
+    const mapaCalc={media:'certo/errado',soma:'lista de compra',nenhum:'sem nota'};
+    const ehPont=['alinhamento','x_unica','x_multipla'].includes(it.tipo);
+    const calcTxt=ehPont?` · ${mapaCalc[it.calculo]||''}`:'';
+    const valsTxt=(ehPont&&it.calculo!=='nenhum'&&(it.opcoes||[]).length)
+      ?`<div class="muted" style="padding:2px 0 0;font-size:12px">${(it.opcoes||[]).map((o,i)=>escapeHtml(o)+'='+(it.valoresOpcoes?.[i]??0)).join(' · ')}</div>`:'';
+    div.innerHTML=`<div><b>${escapeHtml(prefixo)}</b> ${escapeHtml(desc)} <small class="muted">(${tipoLabel} · ${permLabel}${calcTxt})</small>${valsTxt}</div>`;
     const del=document.createElement('button');
     del.type='button';del.className='btn danger';
     del.innerHTML='<i class="fa-solid fa-trash"></i>';
