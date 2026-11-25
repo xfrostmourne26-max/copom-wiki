@@ -183,6 +183,7 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
 .opt-val-badge{font-size:11px;font-weight:700;padding:1px 5px;border-radius:4px;background:#f1f5f9;color:#334155;border:1px solid #cbd5e1}
 .opt-val-badge.active-val{background:#dcfce7;color:#166534;border-color:#86efac}
 .opt-val-inp{width:54px;border:1px solid #94a3b8;border-radius:4px;padding:1px 4px;font-size:11px;font-weight:700;text-align:center;background:#fff;color:#0f172a}
+.opt-elim-badge{font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:4px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
 
 .inline-flow{display:flex;flex-wrap:wrap;align-items:center;gap:5px 7px;line-height:1.7}
 .inline-input{border:0;border-bottom:1.5px solid #475569;background:transparent;color:inherit;padding:1px 4px;font:inherit;outline:none;min-width:44px;text-align:center}
@@ -429,7 +430,7 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
 
             <div class="syntax-help">
               <b>Como funciona a nota e a permissão:</b><br>
-              • Cada pergunta pontua de um de dois jeitos: <b>Certo/errado</b> (entra na média de 0 a 10; a opção marcada vale a fração do maior valor e <code>N/A</code> é ignorada) ou <b>Lista de compra</b> (soma o valor de cada opção marcada; ex.: 3 opções de <code>1</code> ponto, marcando as 3 = 3 pontos).<br>
+              • Cada pergunta pontua de um de três jeitos: <b>Certo/errado</b> (entra na média de 0 a 10; a opção marcada vale a fração do maior valor e <code>N/A</code> é ignorada), <b>Lista de compra</b> (soma o valor de cada opção marcada; ex.: 3 opções de <code>1</code> ponto, marcando as 3 = 3 pontos) ou <b>Eliminatória</b> (se qualquer opção for marcada, zera a nota geral da qualidade).<br>
               • Só lista de compra: nota = total de pontos (ex.: 3 de 3). Só certo/errado: média de 0 a 10. Misturando os dois: nota de 0 a 10, onde cada pergunta certo/errado vale 1 ponto.<br>
               • Qualidade ou superior pode ajustar o valor de cada opção na ficha. Opções com valor <code>0</code> não somam pontos.<br>
               • Usuários de <b>qualidade para cima</b> podem editar e excluir formulários e fichas de qualquer pessoa (inclusive criadas por <code>admin</code>).
@@ -471,6 +472,7 @@ h2.sec{font:400 20px Georgia,serif;border-bottom:1px solid var(--line);padding-b
                   <select id="fb-calculo" onchange="ajustarCamposConstrutor()">
                     <option value="media">Certo/errado (entra na média 0–10)</option>
                     <option value="soma">Lista de compra (soma os pontos marcados)</option>
+                    <option value="eliminatoria">Eliminatória (zera a nota se marcada)</option>
                     <option value="nenhum">Não pontua</option>
                   </select>
                 </label>
@@ -865,7 +867,7 @@ function criarSeletorPermissaoItem(chave,item,isGestor){
   return selEl;
 }
 
-const CALCULOS_VALIDOS=['media','soma','nenhum'];
+const CALCULOS_VALIDOS=['media','soma','eliminatoria','nenhum'];
 function calculoPadraoDoTipo(tipo){
   if(tipo==='x_multipla')return 'soma';
   if(tipo==='alinhamento'||tipo==='x_unica')return 'media';
@@ -887,6 +889,7 @@ function textoValorOpcao(v){
 function formatarNotaFicha(resp){
   const n=resp?._notaFinal;
   if(n===undefined||n===null||n==='')return '';
+  if(resp?._zeradaPorEliminatoria)return `${n} (Zerada)`;
   const max=Number(resp?._notaMaxima);
   return(isFinite(max)&&max>0&&max!==10)?`${n}/${max}`:String(n);
 }
@@ -901,10 +904,14 @@ function normalizarFormConfig(raw){
     formato:cfg.formato||'padrao',
     itens:Array.isArray(cfg.itens)?cfg.itens.map(x=>{
       const opsRaw=Array.isArray(x.opcoes)?x.opcoes:[];
-      const calculo=CALCULOS_VALIDOS.includes(x.calculo)?x.calculo:calculoPadraoDoTipo(x.tipo);
-      const opsParsed=opsRaw.map((o,i)=>parseOpcaoComValor(o,valorPadraoOpcao(calculo,i),calculo!=='soma'));
+      let calculo=CALCULOS_VALIDOS.includes(x.calculo)?x.calculo:calculoPadraoDoTipo(x.tipo);
+      if(!x.calculo && /penalidades cr[ií]ticas|toler[aâ]ncia zero|zera a nota/i.test(`${x.secao||''} ${x.rotulo||''}`)){
+        calculo='eliminatoria';
+      }
+      const opsParsed=opsRaw.map((o,i)=>parseOpcaoComValor(o,valorPadraoOpcao(calculo,i),calculo!=='soma'&&calculo!=='eliminatoria'));
       const salvos=Array.isArray(x.valoresOpcoes)?x.valoresOpcoes:[];
       const valoresFinais=opsParsed.map((p,i)=>{
+        if(calculo==='eliminatoria')return 0;
         if(String(opsRaw[i]??'').includes('='))return p.valor;
         const sv=salvos[i];
         return(typeof sv==='number'&&isFinite(sv))?sv:p.valor;
@@ -1648,17 +1655,28 @@ function salvarValorOpcao(chaveItem,opIdx,valor){
 
 function calcularMediaOpcoesMarcadas(){
   const runner=$('form-runner');
-  if(!runner)return {media:0,qtd:0,soma:0,maximo:10,pontos:0,pontosMax:0};
+  if(!runner)return {media:0,qtd:0,soma:0,maximo:10,pontos:0,pontosMax:0,zerada:false};
 
   const r2=n=>Math.round((n+Number.EPSILON)*100)/100;
   let pontos=0,pontosMax=0,qtdSoma=0;
   let somaFracoes=0,qtdMedia=0,qtdPendentes=0;
+  const penalidadesMarcadas=[];
 
   runner.querySelectorAll('[data-pontuavel="1"]').forEach(grupo=>{
-    const calculo=grupo.dataset.calculo==='soma'?'soma':'media';
+    const calculo=grupo.dataset.calculo||'media';
     const chaveItem=grupo.dataset.qKey;
     const wraps=[...grupo.querySelectorAll('.opt-item-wrap')];
     if(!wraps.length)return;
+
+    if(calculo==='eliminatoria'){
+      wraps.forEach(wrap=>{
+        const inp=wrap.querySelector('input[type="radio"],input[type="checkbox"]');
+        if(inp&&inp.checked){
+          penalidadesMarcadas.push(inp.value.split(':')[0].trim());
+        }
+      });
+      return;
+    }
 
     const itens=wraps.map((wrap,opIdx)=>{
       const inp=wrap.querySelector('input[type="radio"],input[type="checkbox"]');
@@ -1693,8 +1711,14 @@ function calcularMediaOpcoesMarcadas(){
     }
   });
 
-  let nota=0,maximo=10,detalhe='';
-  if(qtdSoma>0&&qtdMedia===0){
+  let nota=0,maximo=10,detalhe='',zerada=false;
+
+  if(penalidadesMarcadas.length>0){
+    zerada=true;
+    nota=0;
+    maximo=10;
+    detalhe=`NOTA ZERADA — Penalidade crítica marcada: ${penalidadesMarcadas.join(', ')}`;
+  }else if(qtdSoma>0&&qtdMedia===0){
     nota=r2(pontos);maximo=r2(pontosMax);
     detalhe=`${nota} de ${maximo} pontos (soma das opções marcadas)`;
   }else if(qtdSoma===0&&qtdMedia>0){
@@ -1707,7 +1731,7 @@ function calcularMediaOpcoesMarcadas(){
   }else{
     detalhe='Nenhuma pergunta com valor foi marcada ainda';
   }
-  if(qtdPendentes>0&&(qtdSoma+qtdMedia)>0)detalhe+=` · ${qtdPendentes} sem resposta`;
+  if(!zerada&&qtdPendentes>0&&(qtdSoma+qtdMedia)>0)detalhe+=` · ${qtdPendentes} sem resposta`;
 
   const notaInp=$('fc-nota-final');
   const detEl=$('fc-pts-detalhe');
@@ -1715,19 +1739,21 @@ function calcularMediaOpcoesMarcadas(){
   if(notaInp)notaInp.value=String(nota);
   respostasRascunho._notaFinal=nota;
   respostasRascunho._notaMaxima=maximo;
+  respostasRascunho._zeradaPorEliminatoria=zerada;
   if(detEl)detEl.textContent=detalhe;
   if(bar){
     const ratio=maximo>0?nota/maximo:0;
-    bar.classList.toggle('zero-alert',(qtdSoma+qtdMedia)===0||ratio<0.5);
+    bar.classList.toggle('zero-alert',zerada||(qtdSoma+qtdMedia)===0||ratio<0.5);
   }
 
-  return {media:nota,qtd:qtdSoma+qtdMedia,soma:nota,maximo,pontos:r2(pontos),pontosMax:r2(pontosMax)};
+  return {media:nota,qtd:qtdSoma+qtdMedia,soma:nota,maximo,pontos:r2(pontos),pontosMax:r2(pontosMax),zerada};
 }
 
 function atualizarBadgesSemRecalcularNota(){
   const runner=$('form-runner');
   if(!runner)return;
   runner.querySelectorAll('[data-pontuavel="1"]').forEach(grupo=>{
+    if(grupo.dataset.calculo==='eliminatoria')return;
     const chaveItem=grupo.dataset.qKey;
     grupo.querySelectorAll('.opt-item-wrap').forEach((wrap,opIdx)=>{
       const valInp=wrap.querySelector('.opt-val-inp');
@@ -1768,6 +1794,14 @@ function criarControleOpcaoPontuavel(chaveItem,opIdx,labelOp,valorPadrao,inputTy
   wrap.append(choice);
 
   if(calculo==='nenhum')return wrap;
+
+  if(calculo==='eliminatoria'){
+    const elimBadge=document.createElement('span');
+    elimBadge.className='opt-elim-badge';
+    elimBadge.textContent='ZERAR NOTA';
+    wrap.append(elimBadge);
+    return wrap;
+  }
 
   const valAtual=obterValorOpcao(chaveItem,opIdx,valorPadrao);
   salvarValorOpcao(chaveItem,opIdx,valAtual);
@@ -2289,10 +2323,16 @@ function montarFormularioInterativo(tituloStr,cfg,htmlExtra){
   };
   if(temNotaSalva){
     atualizarBadgesSemRecalcularNota();
-    const max=Number(respostasRascunho._notaMaxima);
-    if(isFinite(max)&&max>0&&max!==10){
-      const detEl=$('fc-pts-detalhe');
-      if(detEl)detEl.textContent=`Nota registrada: ${respostasRascunho._notaFinal} de ${max}`;
+    const detEl=$('fc-pts-detalhe');
+    const barEl=$('score-summary-bar');
+    if(respostasRascunho._zeradaPorEliminatoria){
+      if(detEl)detEl.textContent='NOTA ZERADA — Penalidade crítica/eliminatória registrada';
+      if(barEl)barEl.classList.add('zero-alert');
+    }else{
+      const max=Number(respostasRascunho._notaMaxima);
+      if(isFinite(max)&&max>0&&max!==10&&detEl){
+        detEl.textContent=`Nota registrada: ${respostasRascunho._notaFinal} de ${max}`;
+      }
     }
   }else{
     calcularMediaOpcoesMarcadas();
@@ -2385,6 +2425,7 @@ async function persistirFicha(novoStatus){
     _vistoUsuario:respostasRascunho._vistoUsuario||null,
     _notaFinal:calc.media,
     _notaMaxima:calc.maximo,
+    _zeradaPorEliminatoria:calc.zerada,
     _qtdOpcoesMedia:calc.qtd,
     _permissoesItens:{...(respostasRascunho._permissoesItens||{})},
     _valoresOpcoes:{...(respostasRascunho._valoresOpcoes||{})}
@@ -2647,11 +2688,16 @@ function ajustarCamposConstrutor(){
   const pontuavel=['alinhamento','x_unica','x_multipla'].includes(tipo);
   $('wrap-fb-calculo').classList.toggle('hidden',!pontuavel);
   const opInp=$('fb-opcoes');
-  const PAD_MEDIA='Sim=10, Não=0, N/A=0',PAD_SOMA='Item A=1, Item B=1, Item C=1';
+  const PAD_MEDIA='Sim=10, Não=0, N/A=0',PAD_SOMA='Item A=1, Item B=1, Item C=1',PAD_ELIM='Erro Geográfico Fatal, Omissão de Risco Vital, Descortesia Grave';
   const calcSel=$('fb-calculo').value;
-  if(pontuavel&&calcSel==='soma'&&opInp.value===PAD_MEDIA)opInp.value=PAD_SOMA;
-  if(pontuavel&&calcSel!=='soma'&&opInp.value===PAD_SOMA)opInp.value=PAD_MEDIA;
-  opInp.placeholder=calcSel==='soma'?'Ex.: Falou o endereço=1, Confirmou o telefone=1, Informou o protocolo=1':'Ex.: Sim=10, Parcial=5, Não=0, N/A=0';
+  if(pontuavel&&calcSel==='soma'&&(opInp.value===PAD_MEDIA||opInp.value===PAD_ELIM))opInp.value=PAD_SOMA;
+  if(pontuavel&&calcSel==='eliminatoria'&&(opInp.value===PAD_MEDIA||opInp.value===PAD_SOMA))opInp.value=PAD_ELIM;
+  if(pontuavel&&calcSel==='media'&&(opInp.value===PAD_SOMA||opInp.value===PAD_ELIM))opInp.value=PAD_MEDIA;
+  opInp.placeholder=calcSel==='soma'
+    ?'Ex.: Falou o endereço=1, Confirmou o telefone=1, Informou o protocolo=1'
+    :(calcSel==='eliminatoria'
+      ?'Ex.: Erro Geográfico Fatal, Omissão de Risco Vital, Descortesia Grave'
+      :'Ex.: Sim=10, Parcial=5, Não=0, N/A=0');
   $('wrap-fb-opcoes').classList.toggle('hidden',tipo!=='x_unica'&&tipo!=='x_multipla'&&tipo!=='alinhamento'&&tipo!=='fechamento_alinhamento');
   $('wrap-fb-colunas').classList.toggle('hidden',tipo!=='tabela');
   $('wrap-fb-assinaturas').classList.toggle('hidden',tipo!=='assinaturas');
@@ -2679,7 +2725,7 @@ function adicionarItemFormulario(){
 
   const opcoesRaw=$('fb-opcoes').value.split(',').map(s=>s.trim()).filter(Boolean);
   const calculo=['alinhamento','x_unica','x_multipla'].includes(tipo)?$('fb-calculo').value:'nenhum';
-  const parsedOps=opcoesRaw.map((o,i)=>parseOpcaoComValor(o,valorPadraoOpcao(calculo,i),calculo!=='soma'));
+  const parsedOps=opcoesRaw.map((o,i)=>parseOpcaoComValor(o,valorPadraoOpcao(calculo,i),calculo!=='soma'&&calculo!=='eliminatoria'));
   const opcoesPadrao=calculo==='soma'?['Item A','Item B','Item C']:['Sim','Não','N/A'];
   const valoresPadrao=calculo==='soma'?[1,1,1]:[10,0,0];
   const opcoes=(tipo==='fechamento_alinhamento')
@@ -2741,10 +2787,10 @@ function renderBuilderItens(){
     const permLabel=it.quemPreenche==='usuario'?'Usuário':'Admin';
     const prefixo=it.tipo==='grade_topo'?'[Grade Topo]':(it.tipo==='assinaturas'?'[Assinaturas]':`[${it.secao}]`);
     const desc=it.tipo==='assinaturas'?(it.assinaturas||[]).join(' | '):it.rotulo;
-    const mapaCalc={media:'certo/errado',soma:'lista de compra',nenhum:'sem nota'};
+    const mapaCalc={media:'certo/errado',soma:'lista de compra',eliminatoria:'eliminatória (zera nota)',nenhum:'sem nota'};
     const ehPont=['alinhamento','x_unica','x_multipla'].includes(it.tipo);
     const calcTxt=ehPont?` · ${mapaCalc[it.calculo]||''}`:'';
-    const valsTxt=(ehPont&&it.calculo!=='nenhum'&&(it.opcoes||[]).length)
+    const valsTxt=(ehPont&&it.calculo!=='nenhum'&&it.calculo!=='eliminatoria'&&(it.opcoes||[]).length)
       ?`<div class="muted" style="padding:2px 0 0;font-size:12px">${(it.opcoes||[]).map((o,i)=>escapeHtml(o)+'='+(it.valoresOpcoes?.[i]??0)).join(' · ')}</div>`:'';
     div.innerHTML=`<div><b>${escapeHtml(prefixo)}</b> ${escapeHtml(desc)} <small class="muted">(${tipoLabel} · ${permLabel}${calcTxt})</small>${valsTxt}</div>`;
     const del=document.createElement('button');
@@ -2784,13 +2830,13 @@ function aplicarModeloManual190P4a6(){
       {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 3: Comunicação, Empatia e Gestão da Ligação',rotulo:'3.3 Gestão do Tempo',detalhe:'Informou pausas quando necessário, manteve orientação e gerenciou tempo dentro da meta (60s).',opcoes:['Sim','Não','N/A'],valoresOpcoes:[10,0,0],colunas:[]},
       {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 4: Processos, Sistema e Encerramento Técnico',rotulo:'4.1 Fluxo no Sistema',detalhe:'Seguiu o POP, digitou concomitantemente no CAD/SADE com clareza e classificou a prioridade.',opcoes:['Sim','Não','N/A'],valoresOpcoes:[10,0,0],colunas:[]},
       {tipo:'alinhamento',quemPreenche:'qualidade',checkEsq:false,secao:'Bloco 4: Processos, Sistema e Encerramento Técnico',rotulo:'4.2 Encerramento Técnico',detalhe:'Confirmou o endereço registrado, passou orientações de segurança e liberou a linha de forma ágil.',opcoes:['Sim','Não','N/A'],valoresOpcoes:[10,0,0],colunas:[]},
-      {tipo:'x_multipla',quemPreenche:'qualidade',checkEsq:false,secao:'Penalidades Críticas - Tolerância Zero',rotulo:'Marque as penalidades críticas constatadas:',opcoes:[
-        'Erro Geográfico Fatal',
-        'Omissão de Risco Vital',
-        'Classificação Incorreta',
-        'Descortesia Grave',
-        'Desconexão Proposital',
-        'Omissão Administrativa'
+      {tipo:'x_multipla',quemPreenche:'qualidade',checkEsq:false,secao:'Penalidades Críticas - Tolerância Zero (Gera Nota Zero Geral)',rotulo:'Marque as penalidades críticas constatadas (qualquer marcação zera a nota):',calculo:'eliminatoria',opcoes:[
+        'Erro Geográfico Fatal: Endereço/bairro errado inviabilizando viatura.',
+        'Omissão de Risco Vital: Não perguntar sobre armas ou feridos graves.',
+        'Classificação Incorreta: Tratar emergência grave como fato simples.',
+        'Descortesia Grave: Ironia, grosseria, insulto ou discussão.',
+        'Desconexão Proposital: Desligar antes de concluir o protocolo.',
+        'Omissão Administrativa: Recusar registro legítimo por julgamento.'
       ],valoresOpcoes:[0,0,0,0,0,0],colunas:[]},
       {tipo:'x_unica',quemPreenche:'qualidade',checkEsq:false,secao:'Classificação do Operador e Providência Gerencial',rotulo:'Classificação do Operador:',opcoes:['Excelente (Padrão Ouro)','Adequado (Operacional)','Abaixo do Padrão (Reciclagem)'],valoresOpcoes:[10,7,0],colunas:[]},
       {tipo:'x_unica',quemPreenche:'qualidade',checkEsq:false,secao:'Classificação do Operador e Providência Gerencial',rotulo:'Providência Gerencial:',opcoes:['Manutenção na Escala / Elogio','Feedback Corretivo em Sala','Trilha de Reciclagem Técnica'],valoresOpcoes:[0,0,0],colunas:[]},
